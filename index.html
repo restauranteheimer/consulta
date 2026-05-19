@@ -1,548 +1,60 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Heimer: Assistente Motoqueiros - Busca de Clientes</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-        }
-        
-        .chat-container {
-            width: 100%;
-            max-width: 500px;
-            height: 700px;
-            max-height: 90vh;
-            background: #f5f7fb;
-            border-radius: 28px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 0 0 20px 20px;
-        }
-        
-        .chat-header h2 {
-            font-size: 20px;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .chat-header p {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-        
-        .status-badge {
-            background: rgba(255,255,255,0.2);
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 11px;
-            display: inline-block;
-            margin-top: 8px;
-        }
-        
-        .status-badge.online {
-            background: rgba(76, 175, 80, 0.3);
-        }
-        
-        .status-badge.offline {
-            background: rgba(244, 67, 54, 0.3);
-        }
-        
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .message {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .message.user {
-            justify-content: flex-end;
-        }
-        
-        .message.bot {
-            justify-content: flex-start;
-        }
-        
-        .message-content {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            line-height: 1.4;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-        
-        .user .message-content {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-        
-        .bot .message-content {
-            background: white;
-            color: #333;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .message-content a {
-            color: #667eea;
-            text-decoration: none;
-            word-break: break-all;
-        }
-        
-        .message-content a:hover {
-            text-decoration: underline;
-        }
-        
-        .typing {
-            padding: 10px 20px;
-            font-size: 13px;
-            color: #999;
-            display: none;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .typing.active {
-            display: flex;
-        }
-        
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-        
-        .typing-dots span {
-            width: 6px;
-            height: 6px;
-            background: #999;
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
-        
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-            30% { transform: translateY(-6px); opacity: 1; }
-        }
-        
-        .error-message {
-            background: #fee;
-            color: #c00;
-            font-size: 12px;
-            padding: 8px 16px;
-            margin: 0 16px 8px 16px;
-            border-radius: 10px;
-            display: none;
-            text-align: center;
-        }
-        
-        .error-message.active {
-            display: block;
-        }
-        
-        .chat-input-area {
-            display: flex;
-            padding: 16px;
-            background: white;
-            border-top: 1px solid #e5e7eb;
-            gap: 10px;
-            align-items: center;
-        }
-        
-        .chat-input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 1px solid #e5e7eb;
-            border-radius: 25px;
-            outline: none;
-            font-size: 15px;
-            transition: all 0.2s;
-        }
-        
-        .chat-input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102,126,234,0.2);
-        }
-        
-        .send-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: opacity 0.2s;
-        }
-        
-        .send-button:hover {
-            opacity: 0.9;
-        }
-        
-        .send-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .quick-actions {
-            display: flex;
-            gap: 8px;
-            padding: 8px 16px 12px;
-            background: white;
-            flex-wrap: wrap;
-            border-top: 1px solid #f0f0f0;
-        }
-        
-        .quick-btn {
-            background: #f0f2f5;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: #667eea;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        
-        .quick-btn:hover {
-            background: #e4e7ec;
-        }
-        
-        @media (max-width: 480px) {
-            .chat-container {
-                height: 95vh;
-                max-height: none;
-                border-radius: 20px;
-            }
-            
-            .message-content {
-                max-width: 85%;
-                font-size: 13px;
-            }
-            
-            .send-button {
-                padding: 10px 16px;
-            }
-        }
-    </style>
+    <title>Teste Webhook</title>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h2>
-                🤖 Assistente Motoqueiros
-            </h2>
-            <p>Consulte clientes cadastrados rapidamente</p>
-            <div class="status-badge" id="statusBadge">🔄 Verificando...</div>
-        </div>
-        
-        <div class="chat-messages" id="messages">
-            <div class="message bot">
-                <div class="message-content">
-                    Olá! 👋<br><br>
-                    <strong>Comandos disponíveis:</strong><br>
-                    🔍 <strong>Buscar cliente:</strong> "buscar João" ou "telefone do João"<br>
-                    📝 <strong>Cadastrar:</strong> "cadastrar Maria 81999999999"<br>
-                    📍 <strong>Com localização:</strong> "cadastrar José 81988887777 Recife"<br><br>
-                    <em>Os dados são salvos automaticamente na planilha!</em>
-                </div>
-            </div>
-        </div>
-        
-        <div class="typing" id="typing">
-            <span>🤖 Assistente</span>
-            <div class="typing-dots">
-                <span></span><span></span><span></span>
-            </div>
-        </div>
-        
-        <div class="error-message" id="errorMessage">
-            ⚠️ Erro de conexão. Tentando novamente...
-        </div>
-        
-        <div class="quick-actions">
-            <button class="quick-btn" onclick="sendQuick('buscar cliente')">🔍 Buscar cliente</button>
-            <button class="quick-btn" onclick="sendQuick('cadastrar cliente')">📝 Cadastrar cliente</button>
-            <button class="quick-btn" onclick="sendQuick('como funciona')">❓ Ajuda</button>
-        </div>
-        
-        <div class="chat-input-area">
-            <input type="text" class="chat-input" id="input" placeholder="Digite sua mensagem..." onkeypress="handleEnter(event)">
-            <button class="send-button" id="sendBtn" onclick="sendMessage()">Enviar</button>
-        </div>
-    </div>
+    <h2>Teste de Conexão com Webhook</h2>
+    <button onclick="testarWebhook()">Testar Conexão</button>
+    <button onclick="buscarCliente()">Buscar Cliente (ex: João)</button>
+    <pre id="resultado" style="background:#f0f0f0; padding:10px; margin-top:20px;">Resultado aparecerá aqui...</pre>
 
     <script>
-        // ==================== ATUALIZE COM SUA URL DO WEBHOOK ====================
-        // Depois de reimplantar o Apps Script com acesso "Qualquer pessoa",
-        // copie a nova URL e cole aqui:
         const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwxvJxG3ejwk9aBIghVEG5HCAxnCEMvuKK-sE19TpDBaSChKrWyKUZxDLaFj1tA1KfS/exec';
-        
-        // Elementos DOM
-        const messagesDiv = document.getElementById('messages');
-        const input = document.getElementById('input');
-        const sendBtn = document.getElementById('sendBtn');
-        const typingDiv = document.getElementById('typing');
-        const errorDiv = document.getElementById('errorMessage');
-        const statusBadge = document.getElementById('statusBadge');
-        
-        let isSending = false;
-        
-        function updateStatus(online, message = '') {
-            if (online) {
-                statusBadge.innerHTML = '🟢 Conectado';
-                statusBadge.className = 'status-badge online';
-                errorDiv.classList.remove('active');
-            } else {
-                statusBadge.innerHTML = '🔴 ' + message;
-                statusBadge.className = 'status-badge offline';
+        const resultadoDiv = document.getElementById('resultado');
+
+        async function testarWebhook() {
+            resultadoDiv.innerHTML = '🔄 Testando conexão...';
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ test: true })
+                });
+                const data = await response.json();
+                resultadoDiv.innerHTML = '✅ Conexão OK!\n' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultadoDiv.innerHTML = '❌ Erro: ' + error.message;
             }
         }
-        
-        function addMessage(text, isUser) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+
+        async function buscarCliente() {
+            const nome = prompt('Digite o nome do cliente para buscar:', 'João');
+            if (!nome) return;
             
-            let formattedText = escapeHtml(text);
-            formattedText = formattedText.replace(/(https:\/\/wa\.me\/\d+)/g, '<a href="$1" target="_blank" rel="noopener noreferrer">📞 $1</a>');
-            formattedText = formattedText.replace(/\n/g, '<br>');
-            
-            messageDiv.innerHTML = `<div class="message-content">${formattedText}</div>`;
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-        
-        function setTyping(visible) {
-            typingDiv.classList.toggle('active', visible);
-        }
-        
-        function setError(visible, message = '') {
-            if (visible) {
-                errorDiv.classList.add('active');
-                if (message) errorDiv.innerHTML = `⚠️ ${message}`;
-                updateStatus(false, 'Erro');
-            } else {
-                errorDiv.classList.remove('active');
-                updateStatus(true);
-            }
-        }
-        
-        function setLoading(loading) {
-            isSending = loading;
-            sendBtn.disabled = loading;
-            input.disabled = loading;
-            sendBtn.textContent = loading ? '...' : 'Enviar';
-        }
-        
-        function detectIntent(text) {
-            const lowerText = text.toLowerCase();
-            if (lowerText.includes('buscar') || lowerText.includes('procura') || lowerText.includes('telefone') || lowerText.includes('qual o')) {
-                return 'ler_registro';
-            }
-            if (lowerText.includes('cadastrar') || lowerText.includes('adicionar') || lowerText.includes('novo') || lowerText.includes('salvar')) {
-                return 'cadastrardireto';
-            }
-            if (lowerText.includes('como funciona') || lowerText.includes('ajuda') || lowerText === '?') {
-                return 'help';
-            }
-            return 'ler_registro';
-        }
-        
-        function extractParameters(text) {
-            const params = {};
-            
-            // Extrai nome (@sys.person)
-            const nameMatch = text.match(/(?:buscar|cadastrar|telefone|cliente|nome|do|da)\s+([A-Za-zÀ-ú\s]+?)(?:\s+\d|$)/i);
-            if (nameMatch && nameMatch[1] && nameMatch[1].trim().length > 2) {
-                params.person = nameMatch[1].trim();
-            }
-            
-            // Extrai telefone (@sys.phone-number)
-            const phoneMatch = text.match(/(\d{10,11})/);
-            if (phoneMatch) {
-                params['phone-number'] = phoneMatch[1];
-            }
-            
-            // Extrai localização (@sys.location)
-            const locationMatch = text.match(/(?:em|de|local|endereco|moro|localizado)\s+([A-Za-zÀ-ú\s]+)$/i);
-            if (locationMatch && locationMatch[1] && !phoneMatch) {
-                params.location = locationMatch[1].trim();
-            }
-            
-            return params;
-        }
-        
-        async function sendMessage() {
-            const text = input.value.trim();
-            if (!text || isSending) return;
-            
-            addMessage(text, true);
-            input.value = '';
-            
-            setLoading(true);
-            setTyping(true);
-            setError(false);
-            
-            if (text.toLowerCase() === 'como funciona' || text.toLowerCase() === 'ajuda' || text === '?') {
-                setTyping(false);
-                addMessage('🔍 *Comandos disponíveis:*\n\n• Buscar cliente: "buscar João"\n• Cadastrar: "cadastrar Maria 81999999999"\n• Com localização: "cadastrar José 81988887777 Recife"\n\nQualquer dúvida, me chame!', false);
-                setLoading(false);
-                input.focus();
-                return;
-            }
-            
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 20000);
-            
+            resultadoDiv.innerHTML = '🔄 Buscando por: ' + nome + '...';
             try {
                 const payload = {
                     queryResult: {
-                        queryText: text,
-                        intent: { displayName: detectIntent(text) },
-                        parameters: extractParameters(text),
+                        queryText: 'buscar ' + nome,
+                        intent: { displayName: 'ler_registro' },
+                        parameters: { person: nome },
                         languageCode: 'pt-BR'
                     }
                 };
                 
-                console.log('Enviando para webhook:', WEBHOOK_URL);
-                
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
-                    mode: 'cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                    signal: controller.signal
+                    body: JSON.stringify(payload)
                 });
-                
-                clearTimeout(timeoutId);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
                 const data = await response.json();
-                console.log('Resposta:', data);
-                
-                setTyping(false);
-                
-                const botResponse = data.fulfillmentText || data.mensagem || 'Desculpe, não consegui processar sua solicitação.';
-                addMessage(botResponse, false);
-                
+                resultadoDiv.innerHTML = '✅ Resposta:\n' + JSON.stringify(data, null, 2);
             } catch (error) {
-                clearTimeout(timeoutId);
-                console.error('Erro detalhado:', error);
-                
-                setTyping(false);
-                
-                let errorMsg = '❌ Erro de conexão. ';
-                if (error.name === 'AbortError') {
-                    errorMsg = '❌ Tempo esgotado. O servidor demorou muito para responder.';
-                } else if (error.message.includes('Failed to fetch')) {
-                    errorMsg = '❌ Não foi possível conectar ao servidor. Verifique se o webhook está publicado com acesso "Qualquer pessoa".';
-                    setError(true, 'Webhook não está acessível. Verifique a publicação do Apps Script.');
-                } else {
-                    errorMsg = `❌ ${error.message}`;
-                }
-                addMessage(errorMsg, false);
-            } finally {
-                setLoading(false);
-                input.focus();
+                resultadoDiv.innerHTML = '❌ Erro: ' + error.message;
             }
         }
-        
-        function sendQuick(command) {
-            input.value = command;
-            sendMessage();
-        }
-        
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function handleEnter(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
-        }
-        
-        async function testConnection() {
-            updateStatus(false, 'Verificando...');
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
-                
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ test: true }),
-                    signal: controller.signal
-                });
-                
-                clearTimeout(timeoutId);
-                
-                if (response.ok) {
-                    console.log('✅ Webhook conectado!');
-                    updateStatus(true);
-                } else {
-                    console.warn('⚠️ Webhook respondeu com status:', response.status);
-                    updateStatus(false, 'HTTP ' + response.status);
-                }
-            } catch (error) {
-                console.warn('⚠️ Webhook offline:', error.message);
-                updateStatus(false, 'Offline');
-                setError(true, 'Webhook não está acessível. Verifique a publicação do Apps Script com acesso "Qualquer pessoa".');
-            }
-        }
-        
-        input.focus();
-        testConnection();
     </script>
 </body>
 </html>
