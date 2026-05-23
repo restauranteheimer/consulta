@@ -57,6 +57,16 @@
             font-size: 14px;
         }
 
+        .stats-box {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+        }
+
         .search-box {
             display: flex;
             gap: 12px;
@@ -246,7 +256,11 @@
         
         <div class="content">
             <div class="info-box">
-                💡 <strong>Como funciona:</strong> Digite o nome do cliente e o sistema buscará no banco de dados, retornando nomes exatos ou com similaridade ≥ 80%.
+                💡 <strong>Como funciona:</strong> Digite o nome do cliente e o sistema buscará na base de dados, retornando nomes exatos ou com similaridade ≥ 80%.
+            </div>
+
+            <div class="stats-box" id="statsBox">
+                📊 Carregando base de dados...
             </div>
 
             <div class="search-box">
@@ -254,23 +268,16 @@
                 <button id="searchButton" class="btn-search">🔍 Buscar</button>
             </div>
 
-            <!-- Exemplos -->
             <div style="margin-bottom: 20px;">
                 <small style="color: #666;">📌 Exemplos: </small>
-                <div class="example-items">
-                    <span class="example-item" data-nome="João">João</span>
-                    <span class="example-item" data-nome="Maria">Maria</span>
-                    <span class="example-item" data-nome="Pedro">Pedro</span>
-                    <span class="example-item" data-nome="Ana">Ana</span>
-                    <span class="example-item" data-nome="Carlos">Carlos</span>
-                </div>
+                <div class="example-items" id="exampleList"></div>
             </div>
 
             <div id="errorMessage" class="error-message"></div>
 
             <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <div>Consultando base de dados...</div>
+                <div>Buscando clientes...</div>
             </div>
 
             <div class="results" id="results">
@@ -282,6 +289,7 @@
 
             <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; font-size: 13px; color: #666;">
                 <strong>ℹ️ Informações:</strong><br>
+                • Base de dados com <span id="totalCount">0</span> clientes<br>
                 • A busca ignora acentos e diferenças entre maiúsculas/minúsculas<br>
                 • Retorna apenas clientes com similaridade ≥ 80%<br>
                 • Clique no botão do WhatsApp para iniciar uma conversa
@@ -290,9 +298,62 @@
     </div>
 
     <script>
-        // Configuração do Webhook
-        const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxnhPwmNEXXYm0nlwRnoTBLm_rIznkKZ8FqN5bzyMxcDMpgEQMVX9SPbnpVSmN3H80/exec';
-        
+        // ==================== BASE DE DADOS ====================
+        const clientes = [
+            { nome: "João Oliveira Junior", telefone: "https://wa.me/5581986823085" },
+            { nome: "Anderson Pereira", telefone: "https://wa.me/5581986332438" },
+            { nome: "Larissa Aristeu", telefone: "https://wa.me/5581996817148" },
+            { nome: "Arthur Melo", telefone: "https://wa.me/5581996258205" },
+            { nome: "Antonio Motta", telefone: "https://wa.me/5581973360846" },
+            { nome: "Maria Clara", telefone: "https://wa.me/5581973141690" },
+            { nome: "Deyvid de Melo", telefone: "https://wa.me/5581988414784" },
+            { nome: "Myllenne Soares", telefone: "https://wa.me/5587981769582" },
+            { nome: "Adriana Barros", telefone: "https://wa.me/5581985782609" },
+            { nome: "Geovanna Melo", telefone: "https://wa.me/5581984226587" },
+            { nome: "Marina Galvão", telefone: "https://wa.me/5581988291511" },
+            { nome: "Claudete Bezerra", telefone: "https://wa.me/5581998168131" },
+            { nome: "Carlos Silva", telefone: "https://wa.me/5581983655507" },
+            { nome: "Camilly Vitoria", telefone: "https://wa.me/5581984263153" },
+            { nome: "Willames Gomes", telefone: "https://wa.me/5581983399601" },
+            { nome: "Jose Adriano", telefone: "https://wa.me/5581986679996" },
+            { nome: "Angelita Passos Batista", telefone: "https://wa.me/5581979114078" },
+            { nome: "Maria Lúcia", telefone: "https://wa.me/5581999739054" },
+            { nome: "Vitor Lavelle", telefone: "https://wa.me/5581994970449" },
+            { nome: "Elizabete Margarida", telefone: "https://wa.me/5581992462328" },
+            { nome: "Errily Stephanie", telefone: "https://wa.me/5581996606209" },
+            { nome: "Larrisa Pontes", telefone: "https://wa.me/5581995293004" },
+            { nome: "Evandro Alves", telefone: "https://wa.me/5581982899165" },
+            { nome: "Mirian", telefone: "https://wa.me/5581986287838" },
+            { nome: "Victória", telefone: "https://wa.me/5581983626959" },
+            { nome: "Aline Monte", telefone: "https://wa.me/5581995964922" },
+            { nome: "Michely Campos", telefone: "https://wa.me/5581998781188" },
+            { nome: "Kayte Andersen", telefone: "https://wa.me/5581996625505" },
+            { nome: "Raul Henrique", telefone: "https://wa.me/5581997922192" },
+            { nome: "Iasmin Gabrielle", telefone: "https://wa.me/5581995663003" },
+            { nome: "Ydalice Rayane", telefone: "https://wa.me/5581983150379" },
+            { nome: "Leidiane Veridiano", telefone: "https://wa.me/5581999737918" },
+            { nome: "Maria Júlia", telefone: "https://wa.me/5581988187720" },
+            { nome: "Yasmin Gomes", telefone: "https://wa.me/5583996418013" },
+            { nome: "Tati Maria", telefone: "https://wa.me/5581985937105" },
+            { nome: "Vitória Myllena", telefone: "https://wa.me/5581984723927" },
+            { nome: "Jose Almir", telefone: "https://wa.me/5581987346168" },
+            { nome: "Larissa de Souza", telefone: "https://wa.me/5581988602643" },
+            { nome: "Maria Fernanda", telefone: "https://wa.me/5581985123354" },
+            { nome: "Talita Lira", telefone: "https://wa.me/5581985140591" },
+            { nome: "William Rhaldney", telefone: "https://wa.me/5581995490408" },
+            { nome: "Carlos Jorge", telefone: "https://wa.me/5581983298312" },
+            { nome: "Thayná Maria", telefone: "https://wa.me/5581989826119" },
+            { nome: "Mayra Lisboa", telefone: "https://wa.me/5581991866126" },
+            { nome: "Cassia Coutinho", telefone: "https://wa.me/5581987289074" },
+            { nome: "L Thomaz", telefone: "https://wa.me/5581984276218" },
+            { nome: "Bruno Gomes", telefone: "https://wa.me/5581999533738" },
+            { nome: "Julia Silva", telefone: "https://wa.me/5581985691621" },
+            { nome: "Bruna Vitoria", telefone: "https://wa.me/5581988268945" },
+            { nome: "Carla Andréa", telefone: "https://wa.me/5581999205561" },
+            { nome: "Alexsson Keven", telefone: "https://wa.me/5579998207504" },
+            { nome: "Lucas Heimer", telefone: "https://wa.me/5581999916443" }
+        ];
+
         // Elementos DOM
         const searchInput = document.getElementById('searchInput');
         const searchButton = document.getElementById('searchButton');
@@ -300,28 +361,75 @@
         const resultsDiv = document.getElementById('results');
         const resultsList = document.getElementById('resultsList');
         const errorMessageDiv = document.getElementById('errorMessage');
-        
-        // Adicionar eventos aos exemplos
-        document.querySelectorAll('.example-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const nome = item.getAttribute('data-nome');
+        const statsBox = document.getElementById('statsBox');
+        const totalCountSpan = document.getElementById('totalCount');
+        const exampleList = document.getElementById('exampleList');
+
+        // Atualizar contador
+        totalCountSpan.textContent = clientes.length;
+        statsBox.innerHTML = `📊 Base de dados carregada: ${clientes.length} clientes`;
+
+        // Criar exemplos (primeiros 10 nomes)
+        const exemplos = clientes.slice(0, 10).map(c => c.nome.split(' ')[0]);
+        const exemplosUnicos = [...new Set(exemplos)];
+        exemplosUnicos.slice(0, 8).forEach(nome => {
+            const span = document.createElement('span');
+            span.className = 'example-item';
+            span.textContent = nome;
+            span.onclick = () => {
                 searchInput.value = nome;
                 buscarCliente(nome);
-            });
+            };
+            exampleList.appendChild(span);
         });
+
+        // ==================== FUNÇÕES ====================
         
-        // Eventos de busca
-        searchButton.addEventListener('click', () => {
-            const nome = searchInput.value.trim();
-            if (nome) buscarCliente(nome);
-        });
-        
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const nome = searchInput.value.trim();
-                if (nome) buscarCliente(nome);
+        function normalizarTexto(texto) {
+            if (!texto) return '';
+            
+            const mapa = {
+                'á': 'a', 'à': 'a', 'ã': 'a', 'â': 'a', 'ä': 'a',
+                'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
+                'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i',
+                'ó': 'o', 'ò': 'o', 'õ': 'o', 'ô': 'o', 'ö': 'o',
+                'ú': 'u', 'ù': 'u', 'û': 'u', 'ü': 'u',
+                'ç': 'c', 'ñ': 'n'
+            };
+            
+            let normalizado = texto.toLowerCase().trim();
+            for (let acento in mapa) {
+                normalizado = normalizado.replace(new RegExp(acento, 'g'), mapa[acento]);
             }
-        });
+            return normalizado.replace(/[^a-z\s]/g, '');
+        }
+        
+        function similaridade(str1, str2) {
+            const a = normalizarTexto(str1);
+            const b = normalizarTexto(str2);
+            
+            if (a === b) return 100;
+            if (a.length === 0 || b.length === 0) return 0;
+            
+            const matriz = [];
+            for (let i = 0; i <= a.length; i++) matriz[i] = [i];
+            for (let j = 0; j <= b.length; j++) matriz[0][j] = j;
+            
+            for (let i = 1; i <= a.length; i++) {
+                for (let j = 1; j <= b.length; j++) {
+                    const custo = a[i-1] === b[j-1] ? 0 : 1;
+                    matriz[i][j] = Math.min(
+                        matriz[i-1][j] + 1,
+                        matriz[i][j-1] + 1,
+                        matriz[i-1][j-1] + custo
+                    );
+                }
+            }
+            
+            const distancia = matriz[a.length][b.length];
+            const maxLen = Math.max(a.length, b.length);
+            return Math.round(((maxLen - distancia) / maxLen) * 100);
+        }
         
         function showError(msg) {
             errorMessageDiv.textContent = msg;
@@ -331,63 +439,55 @@
             }, 5000);
         }
         
-        function extractPhoneNumber(text) {
-            // Extrai números de telefone do texto
-            const matches = text.match(/[\d\(\)\s\-]{10,}/g);
-            if (matches) {
-                for (let match of matches) {
-                    const numbers = match.replace(/\D/g, '');
-                    if (numbers.length >= 10) {
-                        if (!numbers.startsWith('55')) return '55' + numbers;
-                        return numbers;
-                    }
-                }
-            }
-            return null;
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
         
-        function formatWhatsAppLink(text) {
-            // Verifica se já é um link
-            if (text.includes('wa.me') || text.includes('https://')) {
-                return text;
-            }
+        function buscarClientes(nomeBusca) {
+            if (!clientes.length) return [];
             
-            // Tenta extrair números
-            const phone = extractPhoneNumber(text);
-            if (phone) {
-                return 'https://wa.me/' + phone;
-            }
-            
-            return text;
-        }
-        
-        function parseResponse(fullfillmentText) {
-            // Verifica se é uma lista de clientes
-            const linhas = fullfillmentText.split('\n');
-            const clientes = [];
-            
-            for (let linha of linhas) {
-                // Procura por padrão de nome e telefone
-                const nomeMatch = linha.match(/\*([^*]+)\*/);
-                const telefoneMatch = linha.match(/📞\s*([^\s]+)/);
-                
-                if (nomeMatch && nomeMatch[1]) {
-                    let nome = nomeMatch[1].trim();
-                    let telefone = telefoneMatch ? telefoneMatch[1] : '';
-                    
-                    // Remove números de lista (1., 2., etc)
-                    nome = nome.replace(/^\d+\.\s*/, '');
-                    
-                    if (nome && telefone) {
-                        clientes.push({
-                            nome: nome,
-                            telefone: formatWhatsAppLink(telefone)
-                        });
-                    }
+            const resultados = [];
+            for (let cliente of clientes) {
+                const sim = similaridade(nomeBusca, cliente.nome);
+                if (sim >= 80) {
+                    resultados.push({
+                        nome: cliente.nome,
+                        telefone: cliente.telefone,
+                        similaridade: sim
+                    });
                 }
             }
+            resultados.sort((a, b) => b.similaridade - a.similaridade);
+            return resultados.slice(0, 5);
+        }
+        
+        function displayResults(resultados, nomeBusca) {
+            resultsList.innerHTML = '';
             
-            return clientes;
+            if (resultados.length === 0) {
+                resultsList.innerHTML = `<div class="no-results">❌ Nenhum cliente encontrado com similaridade ≥ 80% para "${escapeHtml(nomeBusca)}"</div>`;
+                resultsDiv.style.display = 'block';
+                return;
+            }
+            
+            resultados.forEach(result => {
+                const similarityClass = result.similaridade >= 90 ? 'similarity-high' : 'similarity-medium';
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <div class="result-name">👤 ${escapeHtml(result.nome)}</div>
+                    <div class="result-phone">📞 ${escapeHtml(result.telefone)}</div>
+                    <div class="result-similarity ${similarityClass}">🎯 Similaridade: ${result.similaridade}%</div>
+                    <a href="${result.telefone}" target="_blank" class="whatsapp-button">
+                        💬 Conversar no WhatsApp
+                    </a>
+                `;
+                resultsList.appendChild(card);
+            });
+            resultsDiv.style.display = 'block';
         }
         
         async function buscarCliente(nome) {
@@ -400,94 +500,25 @@
             resultsDiv.style.display = 'none';
             errorMessageDiv.style.display = 'none';
             
-            try {
-                // Prepara a requisição para o webhook
-                const requestBody = {
-                    queryResult: {
-                        intent: {
-                            displayName: 'verificar_nome_exato'
-                        },
-                        parameters: {
-                            person: nome
-                        },
-                        queryText: nome
-                    }
-                };
-                
-                // Faz a requisição
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-                
-                const data = await response.json();
-                const textoResposta = data.fulfillmentText || '';
-                
-                console.log('Resposta do webhook:', textoResposta);
-                
-                // Analisa a resposta
-                if (textoResposta.includes('Não consta no banco de dados')) {
-                    resultsList.innerHTML = `<div class="no-results">❌ Nenhum cliente encontrado com o nome "${escapeHtml(nome)}"</div>`;
-                    resultsDiv.style.display = 'block';
-                    loading.style.display = 'none';
-                    return;
-                }
-                
-                // Tenta extrair clientes da resposta
-                const clientes = parseResponse(textoResposta);
-                
-                if (clientes.length === 0) {
-                    resultsList.innerHTML = `<div class="no-results">❌ Nenhum cliente encontrado com similaridade ≥ 80% para "${escapeHtml(nome)}"</div>`;
-                    resultsDiv.style.display = 'block';
-                    loading.style.display = 'none';
-                    return;
-                }
-                
-                // Exibir resultados
-                displayResults(clientes);
-                
-            } catch (error) {
-                console.error('Erro:', error);
-                showError('Erro ao conectar com o servidor: ' + error.message);
-            } finally {
+            setTimeout(() => {
+                const resultados = buscarClientes(nome);
+                displayResults(resultados, nome);
                 loading.style.display = 'none';
+            }, 300);
+        }
+        
+        // Eventos
+        searchButton.addEventListener('click', () => {
+            const nome = searchInput.value.trim();
+            if (nome) buscarCliente(nome);
+        });
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const nome = searchInput.value.trim();
+                if (nome) buscarCliente(nome);
             }
-        }
-        
-        function displayResults(clientes) {
-            resultsList.innerHTML = '';
-            
-            clientes.forEach((cliente, index) => {
-                // Determina similaridade (se não veio, assume 95%)
-                const similaridade = cliente.similaridade || 95;
-                const similarityClass = similaridade >= 90 ? 'similarity-high' : 'similarity-medium';
-                
-                const card = document.createElement('div');
-                card.className = 'result-card';
-                card.innerHTML = `
-                    <div class="result-name">👤 ${escapeHtml(cliente.nome)}</div>
-                    <div class="result-phone">📞 ${escapeHtml(cliente.telefone)}</div>
-                    <div class="result-similarity ${similarityClass}">🎯 Similaridade: ${similaridade}%</div>
-                    <a href="${cliente.telefone}" target="_blank" class="whatsapp-button">
-                        💬 Conversar no WhatsApp
-                    </a>
-                `;
-                resultsList.appendChild(card);
-            });
-            
-            resultsDiv.style.display = 'block';
-        }
-        
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
+        });
     </script>
 </body>
 </html>
