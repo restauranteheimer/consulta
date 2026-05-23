@@ -1,59 +1,492 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Teste Webhook</title>
-</head>
-<body>
-    <h2>Teste de Conexão com Webhook</h2>
-    <button onclick="testarWebhook()">Testar Conexão</button>
-    <button onclick="buscarCliente()">Buscar Cliente (ex: João)</button>
-    <pre id="resultado" style="background:#f0f0f0; padding:10px; margin-top:20px;">Resultado aparecerá aqui...</pre>
-
-    <script>
-        const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwxvJxG3ejwk9aBIghVEG5HCAxnCEMvuKK-sE19TpDBaSChKrWyKUZxDLaFj1tA1KfS/exec';
-        const resultadoDiv = document.getElementById('resultado');
-
-        async function testarWebhook() {
-            resultadoDiv.innerHTML = '🔄 Testando conexão...';
-            try {
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ test: true })
-                });
-                const data = await response.json();
-                resultadoDiv.innerHTML = '✅ Conexão OK!\n' + JSON.stringify(data, null, 2);
-            } catch (error) {
-                resultadoDiv.innerHTML = '❌ Erro: ' + error.message;
-            }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Clientes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        async function buscarCliente() {
-            const nome = prompt('Digite o nome do cliente para buscar:', 'João');
-            if (!nome) return;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .results {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .results h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .result-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .result-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .result-phone {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .result-similarity {
+            display: inline-block;
+            background: #e0e0e0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .similarity-high {
+            background: #4caf50;
+            color: white;
+        }
+
+        .similarity-medium {
+            background: #ff9800;
+            color: white;
+        }
+
+        .whatsapp-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #25D366;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .whatsapp-button:hover {
+            background: #128C7E;
+            transform: scale(1.05);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .example-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .example-item {
+            background: #f0f0f0;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example-item:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: none;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Consulta de Clientes</h1>
+            <p>Busca por nome exato ou similaridade (mínimo 80%)</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-box">
+                💡 <strong>Como funciona:</strong> Digite o nome do cliente e o sistema buscará no banco de dados, retornando nomes exatos ou com similaridade ≥ 80%.
+            </div>
+
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Digite o nome do cliente..." autocomplete="off">
+                <button id="searchButton" class="btn-search">🔍 Buscar</button>
+            </div>
+
+            <!-- Exemplos -->
+            <div style="margin-bottom: 20px;">
+                <small style="color: #666;">📌 Exemplos: </small>
+                <div class="example-items">
+                    <span class="example-item" data-nome="João">João</span>
+                    <span class="example-item" data-nome="Maria">Maria</span>
+                    <span class="example-item" data-nome="Pedro">Pedro</span>
+                    <span class="example-item" data-nome="Ana">Ana</span>
+                    <span class="example-item" data-nome="Carlos">Carlos</span>
+                </div>
+            </div>
+
+            <div id="errorMessage" class="error-message"></div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>Consultando base de dados...</div>
+            </div>
+
+            <div class="results" id="results">
+                <h3>📋 Resultados encontrados:</h3>
+                <div id="resultsList"></div>
+            </div>
+
+            <hr>
+
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; font-size: 13px; color: #666;">
+                <strong>ℹ️ Informações:</strong><br>
+                • A busca ignora acentos e diferenças entre maiúsculas/minúsculas<br>
+                • Retorna apenas clientes com similaridade ≥ 80%<br>
+                • Clique no botão do WhatsApp para iniciar uma conversa
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração do Webhook
+        const WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbxnhPwmNEXXYm0nlwRnoTBLm_rIznkKZ8FqN5bzyMxcDMpgEQMVX9SPbnpVSmN3H80/exec';
+        
+        // Elementos DOM
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const loading = document.getElementById('loading');
+        const resultsDiv = document.getElementById('results');
+        const resultsList = document.getElementById('resultsList');
+        const errorMessageDiv = document.getElementById('errorMessage');
+        
+        // Adicionar eventos aos exemplos
+        document.querySelectorAll('.example-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const nome = item.getAttribute('data-nome');
+                searchInput.value = nome;
+                buscarCliente(nome);
+            });
+        });
+        
+        // Eventos de busca
+        searchButton.addEventListener('click', () => {
+            const nome = searchInput.value.trim();
+            if (nome) buscarCliente(nome);
+        });
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const nome = searchInput.value.trim();
+                if (nome) buscarCliente(nome);
+            }
+        });
+        
+        function showError(msg) {
+            errorMessageDiv.textContent = msg;
+            errorMessageDiv.style.display = 'block';
+            setTimeout(() => {
+                errorMessageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function extractPhoneNumber(text) {
+            // Extrai números de telefone do texto
+            const matches = text.match(/[\d\(\)\s\-]{10,}/g);
+            if (matches) {
+                for (let match of matches) {
+                    const numbers = match.replace(/\D/g, '');
+                    if (numbers.length >= 10) {
+                        if (!numbers.startsWith('55')) return '55' + numbers;
+                        return numbers;
+                    }
+                }
+            }
+            return null;
+        }
+        
+        function formatWhatsAppLink(text) {
+            // Verifica se já é um link
+            if (text.includes('wa.me') || text.includes('https://')) {
+                return text;
+            }
             
-            resultadoDiv.innerHTML = '🔄 Buscando por: ' + nome + '...';
+            // Tenta extrair números
+            const phone = extractPhoneNumber(text);
+            if (phone) {
+                return 'https://wa.me/' + phone;
+            }
+            
+            return text;
+        }
+        
+        function parseResponse(fullfillmentText) {
+            // Verifica se é uma lista de clientes
+            const linhas = fullfillmentText.split('\n');
+            const clientes = [];
+            
+            for (let linha of linhas) {
+                // Procura por padrão de nome e telefone
+                const nomeMatch = linha.match(/\*([^*]+)\*/);
+                const telefoneMatch = linha.match(/📞\s*([^\s]+)/);
+                
+                if (nomeMatch && nomeMatch[1]) {
+                    let nome = nomeMatch[1].trim();
+                    let telefone = telefoneMatch ? telefoneMatch[1] : '';
+                    
+                    // Remove números de lista (1., 2., etc)
+                    nome = nome.replace(/^\d+\.\s*/, '');
+                    
+                    if (nome && telefone) {
+                        clientes.push({
+                            nome: nome,
+                            telefone: formatWhatsAppLink(telefone)
+                        });
+                    }
+                }
+            }
+            
+            return clientes;
+        }
+        
+        async function buscarCliente(nome) {
+            if (!nome) {
+                showError('Digite um nome para buscar');
+                return;
+            }
+            
+            loading.style.display = 'block';
+            resultsDiv.style.display = 'none';
+            errorMessageDiv.style.display = 'none';
+            
             try {
-                const payload = {
+                // Prepara a requisição para o webhook
+                const requestBody = {
                     queryResult: {
-                        queryText: 'buscar ' + nome,
-                        intent: { displayName: 'ler_registro' },
-                        parameters: { person: nome },
-                        languageCode: 'pt-BR'
+                        intent: {
+                            displayName: 'verificar_nome_exato'
+                        },
+                        parameters: {
+                            person: nome
+                        },
+                        queryText: nome
                     }
                 };
                 
+                // Faz a requisição
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestBody)
                 });
+                
                 const data = await response.json();
-                resultadoDiv.innerHTML = '✅ Resposta:\n' + JSON.stringify(data, null, 2);
+                const textoResposta = data.fulfillmentText || '';
+                
+                console.log('Resposta do webhook:', textoResposta);
+                
+                // Analisa a resposta
+                if (textoResposta.includes('Não consta no banco de dados')) {
+                    resultsList.innerHTML = `<div class="no-results">❌ Nenhum cliente encontrado com o nome "${escapeHtml(nome)}"</div>`;
+                    resultsDiv.style.display = 'block';
+                    loading.style.display = 'none';
+                    return;
+                }
+                
+                // Tenta extrair clientes da resposta
+                const clientes = parseResponse(textoResposta);
+                
+                if (clientes.length === 0) {
+                    resultsList.innerHTML = `<div class="no-results">❌ Nenhum cliente encontrado com similaridade ≥ 80% para "${escapeHtml(nome)}"</div>`;
+                    resultsDiv.style.display = 'block';
+                    loading.style.display = 'none';
+                    return;
+                }
+                
+                // Exibir resultados
+                displayResults(clientes);
+                
             } catch (error) {
-                resultadoDiv.innerHTML = '❌ Erro: ' + error.message;
+                console.error('Erro:', error);
+                showError('Erro ao conectar com o servidor: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
             }
+        }
+        
+        function displayResults(clientes) {
+            resultsList.innerHTML = '';
+            
+            clientes.forEach((cliente, index) => {
+                // Determina similaridade (se não veio, assume 95%)
+                const similaridade = cliente.similaridade || 95;
+                const similarityClass = similaridade >= 90 ? 'similarity-high' : 'similarity-medium';
+                
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <div class="result-name">👤 ${escapeHtml(cliente.nome)}</div>
+                    <div class="result-phone">📞 ${escapeHtml(cliente.telefone)}</div>
+                    <div class="result-similarity ${similarityClass}">🎯 Similaridade: ${similaridade}%</div>
+                    <a href="${cliente.telefone}" target="_blank" class="whatsapp-button">
+                        💬 Conversar no WhatsApp
+                    </a>
+                `;
+                resultsList.appendChild(card);
+            });
+            
+            resultsDiv.style.display = 'block';
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
     </script>
 </body>
