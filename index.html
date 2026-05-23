@@ -2,523 +2,2206 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Clientes HEIMER</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Consulta de Clientes - WhatsApp</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(145deg, #e0e5ec 0%, #f0f4fa 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 24px 16px;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
         }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            opacity: 0.9;
-            font-size: 14px;
-        }
-
-        .content {
-            padding: 30px;
-        }
-
-        .info-box {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
-        .stats-box {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 12px;
-            margin: 25px 0;
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .btn-search {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .btn-search:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            display: none;
-        }
-
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .results {
-            display: none;
-            margin-top: 25px;
-        }
-
-        .results h3 {
-            margin-bottom: 15px;
-            color: #333;
-        }
-
-        .result-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-left: 4px solid #667eea;
-            transition: all 0.3s;
-        }
-
-        .result-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .result-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .result-phone {
-            color: #667eea;
-            font-size: 14px;
-            margin-bottom: 8px;
-            word-break: break-all;
-        }
-
-        .result-similarity {
-            display: inline-block;
-            background: #e0e0e0;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .similarity-high {
-            background: #4caf50;
-            color: white;
-        }
-
-        .similarity-medium {
-            background: #ff9800;
-            color: white;
-        }
-
-        .whatsapp-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #25D366;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 25px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-            margin-top: 10px;
-            transition: all 0.3s;
-        }
-
-        .whatsapp-button:hover {
-            background: #128C7E;
-            transform: scale(1.05);
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-            background: #f8f9fa;
-            border-radius: 15px;
-        }
-
-        .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .example-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .example-item {
-            background: #f0f0f0;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 13px;
-            cursor: pointer;
+        /* card principal */
+        .card {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.05);
+            padding: 1.8rem;
             transition: all 0.2s;
         }
 
-        .example-item:hover {
-            background: #667eea;
-            color: white;
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #075E54, #128C7E);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        hr {
-            margin: 20px 0;
+        h1::before {
+            content: "📇";
+            font-size: 2rem;
+            background: none;
+            -webkit-background-clip: unset;
+            color: #128C7E;
+        }
+
+        .sub {
+            color: #4b5563;
+            margin-top: 6px;
+            margin-bottom: 28px;
+            border-left: 4px solid #25D366;
+            padding-left: 14px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        /* busca */
+        .search-area {
+            background: #f8fafc;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .input-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .field {
+            flex: 3;
+            min-width: 200px;
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 1.2rem;
+            background: white;
+            transition: 0.2s;
+            outline: none;
+        }
+
+        .field input:focus {
+            border-color: #25D366;
+            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.2);
+        }
+
+        .slider-group {
+            flex: 1.5;
+            min-width: 180px;
+        }
+
+        .slider-group label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-top: 8px;
+            accent-color: #25D366;
+        }
+
+        .similarity-value {
+            font-weight: 700;
+            background: #e9f5ef;
+            padding: 2px 10px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+        }
+
+        .btn-buscar {
+            background: #075E54;
             border: none;
-            border-top: 1px solid #eee;
+            color: white;
+            font-weight: 700;
+            padding: 0 28px;
+            height: 52px;
+            border-radius: 2rem;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-buscar:hover {
+            background: #054b42;
+            transform: scale(0.97);
+        }
+
+        /* estatísticas */
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            margin-bottom: 1.2rem;
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 0.75rem;
+        }
+
+        .badge {
+            background: #eef2ff;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e40af;
+        }
+
+        /* cards de resultado */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            transition: all 0.2s;
+            border: 1px solid #eef2f6;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .contact-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px -12px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e1;
+        }
+
+        .contact-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .similarity-tag {
+            background: #e6f7ec;
+            color: #1e7b48;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 40px;
+        }
+
+        .contact-phone {
+            font-family: monospace;
+            font-size: 0.9rem;
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 14px;
+            margin: 12px 0;
+            word-break: break-all;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .whatsapp-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background: #25D366;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 16px;
+            border-radius: 2rem;
+            transition: 0.2s;
+            font-size: 0.85rem;
+            width: fit-content;
+        }
+
+        .whatsapp-link:hover {
+            background: #128C7E;
+            gap: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #5b6e8c;
+            background: #f9fbfd;
+            border-radius: 2rem;
+        }
+
+        footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #5c6f87;
+        }
+
+        @media (max-width: 680px) {
+            .card {
+                padding: 1.2rem;
+            }
+            .input-group {
+                flex-direction: column;
+            }
+            .btn-buscar {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🔍 Consulta de Clientes</h1>
-            <p>Busca por nome exato ou similaridade (mínimo 80%)</p>
-        </div>
-        
-        <div class="content">
-            <div class="info-box">
-                💡 <strong>Como funciona:</strong> Digite o nome do cliente e o sistema buscará na base de dados, retornando nomes exatos ou com similaridade ≥ 80%.
-            </div>
+<div class="container">
+    <div class="card">
+        <h1>Consulta de clientes</h1>
+        <div class="sub">🔍 Busque por nome exato ou similar (≥80%) → telefone + link WhatsApp</div>
 
-            <div class="stats-box" id="statsBox">
-                📊 Carregando base de dados...
-            </div>
-
-            <div class="search-box">
-                <input type="text" id="searchInput" class="search-input" placeholder="Digite o nome do cliente..." autocomplete="off">
-                <button id="searchButton" class="btn-search">🔍 Buscar</button>
-            </div>
-
-            <div style="margin-bottom: 20px;">
-                <small style="color: #666;">📌 Exemplos: </small>
-                <div class="example-items" id="exampleList"></div>
-            </div>
-
-            <div id="errorMessage" class="error-message"></div>
-
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <div>Buscando clientes...</div>
-            </div>
-
-            <div class="results" id="results">
-                <h3>📋 Resultados encontrados:</h3>
-                <div id="resultsList"></div>
-            </div>
-
-            <hr>
-
-            <div style="background: #f5f5f5; padding: 15px; border-radius: 10px; font-size: 13px; color: #666;">
-                <strong>ℹ️ Informações:</strong><br>
-                • Base de dados com <span id="totalCount">0</span> clientes<br>
-                • A busca ignora acentos e diferenças entre maiúsculas/minúsculas<br>
-                • Retorna apenas clientes com similaridade ≥ 80%<br>
-                • Clique no botão do WhatsApp para iniciar uma conversa
+        <div class="search-area">
+            <div class="input-group">
+                <div class="field">
+                    <label>📛 Nome do cliente</label>
+                    <input type="text" id="searchInput" placeholder="Ex: João, Maria, Anderson, Larissa..." autocomplete="off">
+                </div>
+                <div class="slider-group">
+                    <label>🎯 Similaridade mínima <span id="simValue" class="similarity-value">80%</span></label>
+                    <input type="range" id="similaritySlider" min="60" max="100" value="80" step="5">
+                </div>
+                <button class="btn-buscar" id="searchBtn">
+                    <span>🔎</span> Buscar agora
+                </button>
             </div>
         </div>
+
+        <div class="stats">
+            <div class="badge">📋 Base de dados: <strong id="totalCount">0</strong> contatos</div>
+            <div class="badge" id="resultStats">🔎 Aguardando busca</div>
+        </div>
+
+        <div id="resultsContainer" class="results-grid">
+            <div class="empty-state">💡 Digite um nome e clique em "Buscar agora" para localizar clientes similares.</div>
+        </div>
+        <footer>✅ Similaridade ≥ 80% | Nomes tratados com remoção de acentos e caracteres especiais</footer>
     </div>
+</div>
 
-    <script>
-        // ==================== BASE DE DADOS ====================
-        const clientes = [
-            { nome: "João Oliveira Junior", telefone: "https://wa.me/5581986823085" },
-            { nome: "Anderson Pereira", telefone: "https://wa.me/5581986332438" },
-            { nome: "Larissa Aristeu", telefone: "https://wa.me/5581996817148" },
-            { nome: "Arthur Melo", telefone: "https://wa.me/5581996258205" },
-            { nome: "Antonio Motta", telefone: "https://wa.me/5581973360846" },
-            { nome: "Maria Clara", telefone: "https://wa.me/5581973141690" },
-            { nome: "Deyvid de Melo", telefone: "https://wa.me/5581988414784" },
-            { nome: "Myllenne Soares", telefone: "https://wa.me/5587981769582" },
-            { nome: "Adriana Barros", telefone: "https://wa.me/5581985782609" },
-            { nome: "Geovanna Melo", telefone: "https://wa.me/5581984226587" },
-            { nome: "Marina Galvão", telefone: "https://wa.me/5581988291511" },
-            { nome: "Claudete Bezerra", telefone: "https://wa.me/5581998168131" },
-            { nome: "Carlos Silva", telefone: "https://wa.me/5581983655507" },
-            { nome: "Camilly Vitoria", telefone: "https://wa.me/5581984263153" },
-            { nome: "Willames Gomes", telefone: "https://wa.me/5581983399601" },
-            { nome: "Jose Adriano", telefone: "https://wa.me/5581986679996" },
-            { nome: "Angelita Passos Batista", telefone: "https://wa.me/5581979114078" },
-            { nome: "Maria Lúcia", telefone: "https://wa.me/5581999739054" },
-            { nome: "Vitor Lavelle", telefone: "https://wa.me/5581994970449" },
-            { nome: "Elizabete Margarida", telefone: "https://wa.me/5581992462328" },
-            { nome: "Errily Stephanie", telefone: "https://wa.me/5581996606209" },
-            { nome: "Larrisa Pontes", telefone: "https://wa.me/5581995293004" },
-            { nome: "Evandro Alves", telefone: "https://wa.me/5581982899165" },
-            { nome: "Mirian", telefone: "https://wa.me/5581986287838" },
-            { nome: "Victória", telefone: "https://wa.me/5581983626959" },
-            { nome: "Aline Monte", telefone: "https://wa.me/5581995964922" },
-            { nome: "Michely Campos", telefone: "https://wa.me/5581998781188" },
-            { nome: "Kayte Andersen", telefone: "https://wa.me/5581996625505" },
-            { nome: "Raul Henrique", telefone: "https://wa.me/5581997922192" },
-            { nome: "Iasmin Gabrielle", telefone: "https://wa.me/5581995663003" },
-            { nome: "Ydalice Rayane", telefone: "https://wa.me/5581983150379" },
-            { nome: "Leidiane Veridiano", telefone: "https://wa.me/5581999737918" },
-            { nome: "Maria Júlia", telefone: "https://wa.me/5581988187720" },
-            { nome: "Yasmin Gomes", telefone: "https://wa.me/5583996418013" },
-            { nome: "Tati Maria", telefone: "https://wa.me/5581985937105" },
-            { nome: "Vitória Myllena", telefone: "https://wa.me/5581984723927" },
-            { nome: "Jose Almir", telefone: "https://wa.me/5581987346168" },
-            { nome: "Larissa de Souza", telefone: "https://wa.me/5581988602643" },
-            { nome: "Maria Fernanda", telefone: "https://wa.me/5581985123354" },
-            { nome: "Talita Lira", telefone: "https://wa.me/5581985140591" },
-            { nome: "William Rhaldney", telefone: "https://wa.me/5581995490408" },
-            { nome: "Carlos Jorge", telefone: "https://wa.me/5581983298312" },
-            { nome: "Thayná Maria", telefone: "https://wa.me/5581989826119" },
-            { nome: "Mayra Lisboa", telefone: "https://wa.me/5581991866126" },
-            { nome: "Cassia Coutinho", telefone: "https://wa.me/5581987289074" },
-            { nome: "L Thomaz", telefone: "https://wa.me/5581984276218" },
-            { nome: "Bruno Gomes", telefone: "https://wa.me/5581999533738" },
-            { nome: "Julia Silva", telefone: "https://wa.me/5581985691621" },
-            { nome: "Bruna Vitoria", telefone: "https://wa.me/5581988268945" },
-            { nome: "Carla Andréa", telefone: "https://wa.me/5581999205561" },
-            { nome: "Alexsson Keven", telefone: "https://wa.me/5579998207504" },
-            { nome: "Lucas Heimer", telefone: "https://wa.me/5581999916443" }
-        ];
+<script>
+    // --------------------------------------------------------------
+    // 1. DADOS EXTRAÍDOS DIRETAMENTE DO ARQUIVO nomes.txt
+    //    Formato original: Nome + Telefone + Link (coluna Bairro)
+    // --------------------------------------------------------------
+    const rawData = `Nome	Celular/Telefone	Bairro
+João Oliveira Junior	5581986823085	https://wa.me/5581986823085
+Anderson Pereira	5581986332438	https://wa.me/5581986332438
+larissa aristeu	5581996817148	https://wa.me/5581996817148
+Arthur Melo	5581996258205	https://wa.me/5581996258205
+Antonio motta	5581973360846	https://wa.me/5581973360846
+Maria Clara	5581973141690	https://wa.me/5581973141690
+deyvid de melo	819884147840	https://wa.me/819884147840
+Myllenne Soares	5587981769582	https://wa.me/5587981769582
+Adriana Barros	5581985782609	https://wa.me/5581985782609
+Geovanna Melo	5581984226587	https://wa.me/5581984226587
+Marina Galvão	5581988291511	https://wa.me/5581988291511
+Claudete Bezerra	5581998168131	https://wa.me/5581998168131
+Carlos Silva	5581983655507	https://wa.me/5581983655507
+Camilly Vitoria	5581984263153	https://wa.me/5581984263153
+willames gomes	5581983399601	https://wa.me/5581983399601
+jose adriano	5581986679996	https://wa.me/5581986679996
+angelita passos batista	5581979114078	https://wa.me/5581979114078
+Maria Lúcia	5581999739054	https://wa.me/5581999739054
+Vitor Lavelle	5581994970449	https://wa.me/5581994970449
+elizabete margarida	5581992462328	https://wa.me/5581992462328
+errily stephanie	5581996606209	https://wa.me/5581996606209
+Larrisa Pontes	5581995293004	https://wa.me/5581995293004
+Evandro Alves	5581982899165	https://wa.me/5581982899165
+mirian	5581986287838	https://wa.me/5581986287838
+victória	5581983626959	https://wa.me/5581983626959
+Aline Monte	5581995964922	https://wa.me/5581995964922
+michely campos	5581998781188	https://wa.me/5581998781188
+kayte andersen	5581996625505	https://wa.me/5581996625505
+raul henrique	5581997922192	https://wa.me/5581997922192
+iasmin gabrielle	5581995663003	https://wa.me/5581995663003
+ydalice rayane	5581983150379	https://wa.me/5581983150379
+leidiane veridiano	5581999737918	https://wa.me/5581999737918
+maria júlia	5581988187720	https://wa.me/5581988187720
+yasmin gomes	5583996418013	https://wa.me/5583996418013
+tati maria	5581985937105	https://wa.me/5581985937105
+vitória myllena	5581984723927	https://wa.me/5581984723927
+Jose Almir	5581987346168	https://wa.me/5581987346168
+larissa de souza	5581988602643	https://wa.me/5581988602643
+maria fernanda	5581985123354	https://wa.me/5581985123354
+Talita Lira	5581985140591	https://wa.me/5581985140591
+william rhaldney	5581995490408	https://wa.me/5581995490408
+Carlos Jorge	5581983298312	https://wa.me/5581983298312
+thayná maria	5581989826119	https://wa.me/5581989826119
+mayra lisboa	5581991866126	https://wa.me/5581991866126
+Cassia Coutinho	5581987289074	https://wa.me/5581987289074
+l thomaz	5581984276218	https://wa.me/5581984276218
+Bruno Gomes	5581999533738	https://wa.me/5581999533738
+Julia Silva	5581985691621	https://wa.me/5581985691621
+bruna vitoria	5581988268945	https://wa.me/5581988268945
+Carla Andréa	5581999205561	https://wa.me/5581999205561
+Alexsson Keven	5579998207504	https://wa.me/5579998207504
+Maria Conceicao	5581989414296	https://wa.me/5581989414296
+lucy pio	5581988060630	https://wa.me/5581988060630
+Mariane Silva	5581979129230	https://wa.me/5581979129230
+Maciel Cariry	5581987430004	https://wa.me/5581987430004
+jessika roberta	5581988634594	https://wa.me/5581988634594
+Daniel Melo	5581988234989	https://wa.me/5581988234989
+aline cândida	5581987881121	https://wa.me/5581987881121
+Isabely Jeronimo	5581995050931	https://wa.me/5581995050931
+ysabella machado	5581999343811	https://wa.me/5581999343811
+maryanna albert	5581983551925	https://wa.me/5581983551925
+rennan costa	81996675255	https://wa.me/5581996675255
+marina beatriz	81991899290	https://wa.me/5581991899290
+cristiana alves	81998110693	https://wa.me/5581998110693
+renan alves santos	81986082680	https://wa.me/5581986082680
+Carlos Eduardo	81992779871	https://wa.me/5581992779871
+Vanessa Ratis	81991435500	https://wa.me/5581991435500
+wilkerlany campelo trindade da silva	819889234531	https://wa.me/55819889234531
+rosilânia silva	87999863972	https://wa.me/5587999863972
+maria julie	81997055826	https://wa.me/5581997055826
+claudia souza	81988701678	https://wa.me/5581988701678
+matheus guilherme	81973156184	https://wa.me/5581973156184
+jonata oliveira	81991157878	https://wa.me/5581991157878
+john christiann	81999992506	https://wa.me/5581999992506
+elton alves	81999001019	https://wa.me/5581999001019
+bruna maiza	81986847706	https://wa.me/5581986847706
+luiz frança	81996620011	https://wa.me/5581996620011
+Anna Vitória	81983209226	https://wa.me/5581983209226
+izabella freitas da rocha	81986276018	https://wa.me/5581986276018
+robson silva	81984428119	https://wa.me/5581984428119
+mariana brochardt	81997184651	https://wa.me/5581997184651
+arthur luiz	81997543693	https://wa.me/5581997543693
+julia costa	81987675773	https://wa.me/5581987675773
+Flavio	81998200937	https://wa.me/5581998200937
+suzana amaral	81998412184	https://wa.me/5581998412184
+errily stephanie	8196606209	https://wa.me/558196606209
+julienne marcelle de oliveira portolins	81985831291	https://wa.me/5581985831291
+maylla elizabeth	81994803393	https://wa.me/5581994803393
+denílson gomes	81973235771	https://wa.me/5581973235771
+elayne ferreira	81987600227	https://wa.me/5581987600227
+mavem lima	81996516541	https://wa.me/5581996516541
+edilson santana da silva	81985366669	https://wa.me/5581985366669
+sthefany dubrinsky	81989121410	https://wa.me/5581989121410
+josane tavares	83986134494	https://wa.me/5583986134494
+júnior silva	81982892950	https://wa.me/5581982892950
+gabrielle sousa	81971033674	https://wa.me/5581971033674
+bruno gomes	81999533738	https://wa.me/5581999533738
+kathleen carvalho	81985667459	https://wa.me/5581985667459
+júlia luna	81983659274	https://wa.me/5581983659274
+Lucas Lima	81996053283	https://wa.me/5581996053283
+ana carolina	81996695089	https://wa.me/5581996695089
+renata ribeiro da silva	81989340441	https://wa.me/5581989340441
+alex silva	81992055685	https://wa.me/5581992055685
+vítor monteiro	8189117557	https://wa.me/558189117557
+viviane	81993537757	https://wa.me/5581993537757
+mariana gomes	81999173873	https://wa.me/5581999173873
+Rafael Barros	81982046600	https://wa.me/5581982046600
+augusto barbosa	81987878070	https://wa.me/5581987878070
+luis rodrigues	81996324121	https://wa.me/5581996324121
+arnaldo carlos de sousa gomes	81999486398	https://wa.me/5581999486398
+thiago cesar	81981061299	https://wa.me/5581981061299
+maria araújo	81991780417	https://wa.me/5581991780417
+ewellyn samantha da silva	81998363170	https://wa.me/5581998363170
+hebert oliveira	81997270599	https://wa.me/5581997270599
+kauã henrique	81999705355	https://wa.me/5581999705355
+dominique hellen	84999595552	https://wa.me/5584999595552
+juliana gonzalez monteiro silva de barros cavalcanti	81992480899	https://wa.me/5581992480899
+gabriel oliveira	8199103948	https://wa.me/558199103948
+felipe santos	81985063695	https://wa.me/5581985063695
+renata dantas	81986050217	https://wa.me/5581986050217
+rodrigo rodrigues	81998665417	https://wa.me/5581998665417
+Rodrigo william	5581993228708	https://wa.me/5581993228708
+Pedro Henrique Guedes	5581995235116	https://wa.me/5581995235116
+Everton nascimento	5581973234220	https://wa.me/5581973234220
+Raphaela Helloyza	5581989499060	https://wa.me/5581989499060
+Danilo Almeida	5581996786110	https://wa.me/5581996786110
+Regina Maria	5581981790584	https://wa.me/5581981790584
+Carol	5581988891465	https://wa.me/5581988891465
+Nicolly Carla	5581997842074	https://wa.me/5581997842074
+Marlon Wilton	5581996593832	https://wa.me/5581996593832
+Flavia Freitas	5581973454774	https://wa.me/5581973454774
+João Vitor	5581981811647	https://wa.me/5581981811647
+Kauan Costa	5581982131259	https://wa.me/5581982131259
+Luana Cristina	5581987938827	https://wa.me/5581987938827
+Pedro Henrique	5581996611181	https://wa.me/5581996611181
+John Christiann	5581999992506	https://wa.me/5581999992506
+Lucas Paes Melo de Mattos	558132991933	https://wa.me/558132991933
+Max Sylvah	5581999435980	https://wa.me/5581999435980
+Alexsandro Guimarães	5581993502560	https://wa.me/5581993502560
+Paulo Medeiros	5581997568551	https://wa.me/5581997568551
+Nicolas Barbosa de Azevedo	5581991023881	https://wa.me/5581991023881
+Naiara Ribeiro	5581986578505	https://wa.me/5581986578505
+Everton Silva	5581987922642	https://wa.me/5581987922642
+Larissa Graziella	5581994806160	https://wa.me/5581994806160
+Duda Azevedo	5581992020263	https://wa.me/5581992020263
+Roberval Mario	5581993969656	https://wa.me/5581993969656
+Arlley Aciolly	5581992076260	https://wa.me/5581992076260
+Vinicius Junior	5581984690140	https://wa.me/5581984690140
+Josineide Figueiredo	5581987551893	https://wa.me/5581987551893
+Ecore Nascimento	5586999502069	https://wa.me/5586999502069
+Letícia Lorrany Silva	5581991140268	https://wa.me/5581991140268
+Larissa Gabrielly	5581993321459	https://wa.me/5581993321459
+Andréa Félix	5581985144084	https://wa.me/5581985144084
+Cristiane Andrade	5581987893399	https://wa.me/5581987893399
+Ângela Marinho	5511989384587	https://wa.me/5511989384587
+Adriana Lima	5581987895210	https://wa.me/5581987895210
+Natalie Victoria	5581996450848	https://wa.me/5581996450848
+Karllyane de Oliveira	5581988555713	https://wa.me/5581988555713
+Wendell Silva	5581999661173	https://wa.me/5581999661173
+Sabrina Pineiro	5581993119059	https://wa.me/5581993119059
+Ytalo Silva	5581989198887	https://wa.me/5581989198887
+Rosivaldo da Silva	5581998381171	https://wa.me/5581998381171
+Rodrigo Silva	5581985405693	https://wa.me/5581985405693
+Emanuelle Gomes	5581986600835	https://wa.me/5581986600835
+Elizangela Conceição	5581985931694	https://wa.me/5581985931694
+Mauro Filipe da Silva Pontes	5581998801411	https://wa.me/5581998801411
+Mateus Aciole	5581996171468	https://wa.me/5581996171468
+Erick Graziani	5581987351640	https://wa.me/5581987351640
+Andreza Santos	5581992708218	https://wa.me/5581992708218
+Isa Chalegre	5581999005644	https://wa.me/5581999005644
+Mariely Silva	5581999215215	https://wa.me/5581999215215
+Nayara Naís	5581984816916	https://wa.me/5581984816916
+Luciana Barros Gomes	5581996674143	https://wa.me/5581996674143
+Marta Ferreira	5581988803760	https://wa.me/5581988803760
+Igor Rocha	5583993189396	https://wa.me/5583993189396
+Gianni Guimarães	5581996755974	https://wa.me/5581996755974
+Alexandre Gallindo	5581997211300	https://wa.me/5581997211300
+Edivânia Elias	5581988888707	https://wa.me/5581988888707
+Aynara Vieira	5581985989119	https://wa.me/5581985989119
+Maria Silva	5581999756718	https://wa.me/5581999756718
+Alex Silva	5581997288343	https://wa.me/5581997288343
+Carlos Alexandre Alexandre	5581988985368	https://wa.me/5581988985368
+Iris Virginia	5581984081757	https://wa.me/5581984081757
+Caua Filipe	5581986389057	https://wa.me/5581986389057
+Gleyce Kelly Assis de Oliveira	5581984553321	https://wa.me/5581984553321
+Valber Rafael	5581989955246	https://wa.me/5581989955246
+Yaya Salesxz	5581996263358	https://wa.me/5581996263358
+Mylena Lima	5581989324008	https://wa.me/5581989324008
+Alexandre Silva	5581997041260	https://wa.me/5581997041260
+Ana Paula da Silva	5511976453742	https://wa.me/5511976453742
+Allana Damasio	5581985054552	https://wa.me/5581985054552
+Aleana Lobo	5581997033681	https://wa.me/5581997033681
+Leticia Vitoria	5581998614204	https://wa.me/5581998614204
+Carlos Eduardo	5581994721668	https://wa.me/5581994721668
+Mairton Faustino	5587991379190	https://wa.me/5587991379190
+Fabio Junio	5581997460682	https://wa.me/5581997460682
+Robson Augusto Alves Custódio	5581984174144	https://wa.me/5581984174144
+Erasmo Neto	5581989160425	https://wa.me/5581989160425
+Deivson Souza	5581998671773	https://wa.me/5581998671773
+Marcelle Alves	5511951220282	https://wa.me/5511951220282
+Ana Cristina Teixeira Santos	5582981435495	https://wa.me/5582981435495
+Vitoria Lopes	5581992227744	https://wa.me/5581992227744
+Viviann Beatriz	5581993261772	https://wa.me/5581993261772
+Mayana Lary	5581991284161	https://wa.me/5581991284161
+Liliane Alves do Vale Alves	5581997131074	https://wa.me/5581997131074
+Lucas Travassos	5581985543658	https://wa.me/5581985543658
+Ana Claudia	5581986616121	https://wa.me/5581986616121
+Felipe Lopes	5581998709610	https://wa.me/5581998709610
+Luciana Canuto Gico	5581985728209	https://wa.me/5581985728209
+Gabriel Oliveira	5581999210941	https://wa.me/5581999210941
+Marianna Guimarães	5581993128254	https://wa.me/5581993128254
+Karine Guimaraes	5581998642694	https://wa.me/5581998642694
+Sandrinha Oliveira	5581997576332	https://wa.me/5581997576332
+Jonathan Carlos Monteiro	5581992938389	https://wa.me/5581992938389
+Estefani Marques	5581983195624	https://wa.me/5581983195624
+Silas Gomes	5581993964461	https://wa.me/5581993964461
+Luana Millena	5581999282691	https://wa.me/5581999282691
+Jose Moises Cabral Silva	5581989910096	https://wa.me/5581989910096
+Izabel Cristina	5581999363862	https://wa.me/5581999363862
+Bruna Rafaela Costa Braz	5581994811660	https://wa.me/5581994811660
+Yêda Sofia	5581983771168	https://wa.me/5581983771168
+Maria Araújo	5581991780417	https://wa.me/5581991780417
+Eduarda Kellen	5581987007360	https://wa.me/5581987007360
+Ana Carolina	5581992206181	https://wa.me/5581992206181
+Allan Fonseca	5581981665165	https://wa.me/5581981665165
+Dennys	5581979066550	https://wa.me/5581979066550
+Adriana Paz	5581998755215	https://wa.me/5581998755215
+Luzidayene Araújo	5581986567131	https://wa.me/5581986567131
+Jose Luciano Chaves	5581997140584	https://wa.me/5581997140584
+Esdras Junior	5581996547800	https://wa.me/5581996547800
+Guilherme Lacerda	5581995380863	https://wa.me/5581995380863
+Islane Silva	5581984913729	https://wa.me/5581984913729
+Jessica Azevedo	5581997232586	https://wa.me/5581997232586
+Fabiola Campos	5581996674389	https://wa.me/5581996674389
+Karolayne Souza	5581985063324	https://wa.me/5581985063324
+Emilly Victória	5581999597221	https://wa.me/5581999597221
+Nagila Gomes	5581996824609	https://wa.me/5581996824609
+Ingrid Marinho	5581983047919	https://wa.me/5581983047919
+Flávio Martins Menezes	5581996194377	https://wa.me/5581996194377
+Antônio Moura	5581989680922	https://wa.me/5581989680922
+Danilo	5581996842262	https://wa.me/5581996842262
+Wesley	5581984118986	https://wa.me/5581984118986
+Aline Tavares	5581996075895	https://wa.me/5581996075895
+Jefferson Luan	5581999263325	https://wa.me/5581999263325
+Maria Luiza	5581993308742	https://wa.me/5581993308742
+Yasmin Freire	5581997847408	https://wa.me/5581997847408
+Maria Eduarda Pereira	5581999344170	https://wa.me/5581999344170
+Thaís Lundgren	5581997893180	https://wa.me/5581997893180
+Thais Alexandre da Silva	5581992972170	https://wa.me/5581992972170
+Maria Cosme	5581985927974	https://wa.me/5581985927974
+Kamylle Güize	5581996952261	https://wa.me/5581996952261
+Karol Kah_montenegro	5581995165755	https://wa.me/5581995165755
+Iuri Torres	5581973458833	https://wa.me/5581973458833
+Lucas Dias Oliveira	619812566774526	https://wa.me/619812566774526
+Yago	5581999627160	https://wa.me/5581999627160
+José Luiz Araújo	5581986638962	https://wa.me/5581986638962
+Rivinha	5581986699381	https://wa.me/5581986699381
+Thaysa Kelly	5581988823953	https://wa.me/5581988823953
+Emilly Vanessa	5581985639506	https://wa.me/5581985639506
+Paulilha Santiago	5581997400371	https://wa.me/5581997400371
+Rafaela Dias	5581996823752	https://wa.me/5581996823752
+Victor Barbosa	5511970111058	https://wa.me/5511970111058
+Júlio Venceslau	5581992291644	https://wa.me/5581992291644
+Letícia Sousa	5583991969126	https://wa.me/5583991969126
+Lucas José	5581983433104	https://wa.me/5581983433104
+Wesley Kennedy Melo	5581988928482	https://wa.me/5581988928482
+Roberto Oliveira	5581986092940	https://wa.me/5581986092940
+Ruth Oliveira	5581999333551	https://wa.me/5581999333551
+Severo	5581985669531	https://wa.me/5581985669531
+Luana Victoria	5581995197143	https://wa.me/5581995197143
+Regina Ferraz	5581987625743	https://wa.me/5581987625743
+Thiago Sousa Ramos	5587988191713	https://wa.me/5587988191713
+Marcelo José Costa Marinho	5581984667611	https://wa.me/5581984667611
+Fernanda Carvalho	5581988288970	https://wa.me/5581988288970
+Wildny Fernanda	5581996229554	https://wa.me/5581996229554
+Rafaella Melo	5581986961511	https://wa.me/5581986961511
+Vitor Aquino	5581979101880	https://wa.me/5581979101880
+Malu Lopes	5581985880266	https://wa.me/5581985880266
+Francisco Santos Junior	5581985170958	https://wa.me/5581985170958
+Juliana Moreira	5581991832848	https://wa.me/5581991832848
+Mirian Santos	5581985815803	https://wa.me/5581985815803
+Andréa Menezes	5581987418670	https://wa.me/5581987418670
+Hugo Vianna	5581997094363	https://wa.me/5581997094363
+Layze Evellin	5581996812688	https://wa.me/5581996812688
+Shirlaine Carvalho	5581984122799	https://wa.me/5581984122799
+Valeria Trajano	5581992624017	https://wa.me/5581992624017
+Suzana Menezes	5581988275524	https://wa.me/5581988275524
+Iury Silva	5581993399858	https://wa.me/5581993399858
+Guilherme Vieira	5581986557486	https://wa.me/5581986557486
+Melanie Barbosa	5581997519655	https://wa.me/5581997519655
+Júnior Rodrigues	5581983225470	https://wa.me/5581983225470
+Ygor Nascimento	5581983125819	https://wa.me/5581983125819
+Robson Simplício dos Santos Simplício	5581984740258	https://wa.me/5581984740258
+Luciana Maria	5581988770100	https://wa.me/5581988770100
+Yago Riquelme	5581986327221	https://wa.me/5581986327221
+Odinete Ivanise Ivanise	5581988082393	https://wa.me/5581988082393
+Renato Cunha	5581993299426	https://wa.me/5581993299426
+Henrique Domingos	5581997282443	https://wa.me/5581997282443
+Ryan Alison	5581987427213	https://wa.me/5581987427213
+Luciana	5581995989114	https://wa.me/5581995989114
+Matheus Felipe	5581992830694	https://wa.me/5581992830694
+Rosemaray Maria	5581993593351	https://wa.me/5581993593351
+Tahuan Albuquerque	5581994856937	https://wa.me/5581994856937
+Aslley Emanuel	5581986751379	https://wa.me/5581986751379
+Karolliny Rodrigues	5584999714914	https://wa.me/5584999714914
+Melaine Menezes	5581982991994	https://wa.me/5581982991994
+Hugo Vinícius Valentim Damasceno	5581987726780	https://wa.me/5581987726780
+Leone Santos de Lima	5581988197433	https://wa.me/5581988197433
+Pedro Leonardo	5581984393153	https://wa.me/5581984393153
+Innara Maria	5581984080617	https://wa.me/5581984080617
+Weslley Santos	5581984735359	https://wa.me/5581984735359
+Suzana Barbosa	5581979003948	https://wa.me/5581979003948
+Felipe Fernandes	5583999131318	https://wa.me/5583999131318
+Eliziane Sabino	5585974010083	https://wa.me/5585974010083
+Luis Henrique Reis	5581985700842	https://wa.me/5581985700842
+Ana Paula	5581989756791	https://wa.me/5581989756791
+Rafaella Maria	5581985049362	https://wa.me/5581985049362
+Thiago Lima	5581987734806	https://wa.me/5581987734806
+Grazielly Nicoly	5581989844863	https://wa.me/5581989844863
+Annelise Candido	5581997208702	https://wa.me/5581997208702
+Matheus Souza	5581986520167	https://wa.me/5581986520167
+Day	5581996858041	https://wa.me/5581996858041
+Kaylane Skarlet	5581991851228	https://wa.me/5581991851228
+Fabrícia Evelyn	5581996103291	https://wa.me/5581996103291
+Werikson Santana	5581997161717	https://wa.me/5581997161717
+D'angellos de Lucas	5581989850064	https://wa.me/5581989850064
+Thifany Silva	5581979008175	https://wa.me/5581979008175
+Alberto Freitas	5581999250470	https://wa.me/5581999250470
+Gabriela Vitória	5581986670896	https://wa.me/5581986670896
+Felipe Alves	5581989847709	https://wa.me/5581989847709
+Leticia Fay	5581999081312	https://wa.me/5581999081312
+Jose Italo Fernandes de Almeida	5588998063368	https://wa.me/5588998063368
+Lany Keyllainy	5581996324307	https://wa.me/5581996324307
+Gabriel Lins	5581997123625	https://wa.me/5581997123625
+Maria Luiza	5581992568794	https://wa.me/5581992568794
+Laryssa	5581981504290	https://wa.me/5581981504290
+Farias Junior	5581987404523	https://wa.me/5581987404523
+Walber Lins	5581999710861	https://wa.me/5581999710861
+Cessa Lins	5581999490938	https://wa.me/5581999490938
+Suyene	5581992030367	https://wa.me/5581992030367
+Lucas Silva	5581984037138	https://wa.me/5581984037138
+Samira Arantes	5581984107628	https://wa.me/5581984107628
+Jéssica Souza	5581995202218	https://wa.me/5581995202218
+Andreia Fernanda Meneses	5581996247142	https://wa.me/5581996247142
+Fabiana Nascimento	5581973163009	https://wa.me/5581973163009
+João Neto	5584994765272	https://wa.me/5584994765272
+Michelle Telles	5581987936501	https://wa.me/5581987936501
+Danielle Braga	5581997850047	https://wa.me/5581997850047
+Naldyson Aragao	5582991044646	https://wa.me/5582991044646
+Edson Araujo Jose Araujo	5581998689763	https://wa.me/5581998689763
+Eliel Ferreira	5581997551490	https://wa.me/5581997551490
+Débora Mel	5581993546477	https://wa.me/5581993546477
+Sérgio Almeida	5581993720749	https://wa.me/5581993720749
+Isabel Alves de Melo	5581983131415	https://wa.me/5581983131415
+Cynara Veras	5584986317048	https://wa.me/5584986317048
+Henrique Ferreira	5581992059859	https://wa.me/5581992059859
+João Lucas	5581987349767	https://wa.me/5581987349767
+Rodharaujo Brueart	5581995425729	https://wa.me/5581995425729
+Victor Alexandre	5581985284706	https://wa.me/5581985284706
+Sílvia Carneiro	5581986991215	https://wa.me/5581986991215
+Pedro	5581989021771	https://wa.me/5581989021771
+Mari Silva Naativa	5581995417191	https://wa.me/5581995417191
+Izabela Estreliane	5581981721257	https://wa.me/5581981721257
+Vitor Moura	5581988446318	https://wa.me/5581988446318
+Jessika Silva	5581983423863	https://wa.me/5581983423863
+Fatima Vieira	5581988339436	https://wa.me/5581988339436
+Alex Sena	5581989000364	https://wa.me/5581989000364
+Estevão Andrade Andrade	5581985104600	https://wa.me/5581985104600
+Thais	5581987102932	https://wa.me/5581987102932
+Lena Muniz Nunes	5581994606674	https://wa.me/5581994606674
+Ester de Almeida	5581989298604	https://wa.me/5581989298604
+Fabio	5581995230729	https://wa.me/5581995230729
+Rosangela Páscoa	5581998839822	https://wa.me/5581998839822
+Emelly Wendy Almeida da Silva	5581994316849	https://wa.me/5581994316849
+Rian Welky Oliveira Barbosa	5581993907099	https://wa.me/5581993907099
+Vanessa Oliveira	5581999242971	https://wa.me/5581999242971
+Matheus Henrique	5581998036831	https://wa.me/5581998036831
+Vivian Milena	5581986949117	https://wa.me/5581986949117
+Nandinho Fernando	5581984964384	https://wa.me/5581984964384
+Eduardo Lourenço	5581988543418	https://wa.me/5581988543418
+Tiago Paraiba	5581996776691	https://wa.me/5581996776691
+Polyanna Gusmão	5581986892979	https://wa.me/5581986892979
+Ana Fofa	5581987786946	https://wa.me/5581987786946
+Karolina Araujo	5581982930594	https://wa.me/5581982930594
+Vinícius Oliveira	5581999328386	https://wa.me/5581999328386
+Kaylane Soares	5581982035288	https://wa.me/5581982035288
+Fábio Jr	5581989301207	https://wa.me/5581989301207
+Micaella Araújo	5581986394539	https://wa.me/5581986394539
+Rayanna Souza	5581997136450	https://wa.me/5581997136450
+Girlene Rodrigues	5581984087142	https://wa.me/5581984087142
+Jessica	5579991234954	https://wa.me/5579991234954
+Rafael	5581997086445	https://wa.me/5581997086445
+Alessandra Nascimento	5581991313472	https://wa.me/5581991313472
+Rosilene Araújo Veríssimo	5581994978748	https://wa.me/5581994978748
+Pedro Lucena	5581983917675	https://wa.me/5581983917675
+Luciana Marinho	5581987944361	https://wa.me/5581987944361
+Jonathan Silva	5581984467159	https://wa.me/5581984467159
+Debora Barros	5581995058148	https://wa.me/5581995058148
+Elton Martins	5581994225344	https://wa.me/5581994225344
+Júlio Kevin	5582999336867	https://wa.me/5582999336867
+Cleison Luciano Pereira da Silva	5581981237886	https://wa.me/5581981237886
+Paulo Sergio	5581995187718	https://wa.me/5581995187718
+Vandercley Pontes	5581995938543	https://wa.me/5581995938543
+Carlos Duarte	5581999667904	https://wa.me/5581999667904
+Filipe Cassiano	5581996418361	https://wa.me/5581996418361
+Beatryz Pereira	5581985227440	https://wa.me/5581985227440
+Diego Lira	5581997147900	https://wa.me/5581997147900
+Douglas	5581995827771	https://wa.me/5581995827771
+Allan de Assis	5581994602602	https://wa.me/5581994602602
+Maria Helena	5581997499712	https://wa.me/5581997499712
+Clarice	5581981525777	https://wa.me/5581981525777
+Pedro	5581996534795	https://wa.me/5581996534795
+Nicholas	5581997262881	https://wa.me/5581997262881
+Luis Miguel	5581997230971	https://wa.me/5581997230971
+Renato Hércules	5562982363583	https://wa.me/5562982363583
+Marília Gabriela Lopes	5581997748555	https://wa.me/5581997748555
+Larisse Gabrielle	5581973259137	https://wa.me/5581973259137
+Dayane Carvalho	5581985084023	https://wa.me/5581985084023
+Ana Beatriz	5581996682649	https://wa.me/5581996682649
+Luciano Souza	5581987641068	https://wa.me/5581987641068
+Maiara Manuela	558197669332	https://wa.me/558197669332
+Luks Xx	5581994710322	https://wa.me/5581994710322
+Hannah Freitas	5581988336699	https://wa.me/5581988336699
+Haysha Santos	5581997475130	https://wa.me/5581997475130
+Henrique Jose	5581995303323	https://wa.me/5581995303323
+Jeferson Luis	5581986195803	https://wa.me/5581986195803
+Sé Tavares	5581989267944	https://wa.me/5581989267944
+Italo Monteiro	5581982201814	https://wa.me/5581982201814
+Thiago Andre	5581994706531	https://wa.me/5581994706531
+Flavio Jose	5581992325253	https://wa.me/5581992325253
+Raphaela	5581984473954	https://wa.me/5581984473954
+Matheus Augusto	5581991989041	https://wa.me/5581991989041
+Sebastiao	5581991955185	https://wa.me/5581991955185
+Carlos Orlando Maia	5581996645254	https://wa.me/5581996645254
+Valeria Dias	5581991424280	https://wa.me/5581991424280
+Renato Silva	5581998743302	https://wa.me/5581998743302
+Anjaylson Alves da Silva Alves	5581984554089	https://wa.me/5581984554089
+Jhonathan Alves	5581986572586	https://wa.me/5581986572586
+Elizangela Alves	5581996853539	https://wa.me/5581996853539
+Mayara Bezerra	5581987129686	https://wa.me/5581987129686
+Evaristo de Moura Felix	5581999890782	https://wa.me/5581999890782
+Maria Julia Lira	5581987666692	https://wa.me/5581987666692
+Ronald Barbosa	5581994963506	https://wa.me/5581994963506
+Adriana de Oliveira Lopes	5581993987874	https://wa.me/5581993987874
+Anna Clara	5581994985461	https://wa.me/5581994985461
+Joana Carla	5581984689421	https://wa.me/5581984689421
+Atthur Pascoal	5581991944441	https://wa.me/5581991944441
+Richard Edward	5581997881806	https://wa.me/5581997881806
+Guiga Pinheiro	5581996794011	https://wa.me/5581996794011
+Armando Filho Android	5581971167370	https://wa.me/5581971167370
+Isabela Souza	5581985270432	https://wa.me/5581985270432
+Luciana Lira	5581987486144	https://wa.me/5581987486144
+Barbara Cristiane	5581984869928	https://wa.me/5581984869928
+Leandro Amorim	5581997268377	https://wa.me/5581997268377
+Ellen França	5581997930308	https://wa.me/5581997930308
+Lara Christinne Santos	5581996280618	https://wa.me/5581996280618
+Fernando Lapenda	5581992894981	https://wa.me/5581992894981
+Marcela Karolina	5581997320235	https://wa.me/5581997320235
+Adriel José Friedrich	5599991491904	https://wa.me/5599991491904
+Lucas Marques	5581999425675	https://wa.me/5581999425675
+Rudolft dos Santos Bezerra de Lima Félix	5581992292109	https://wa.me/5581992292109
+Giovanna Lucena	5581994833515	https://wa.me/5581994833515
+Maria Carolina	5581987317436	https://wa.me/5581987317436
+Suane Costa	5581988153407	https://wa.me/5581988153407
+Andréa Ferreira Cruz	5581995665943	https://wa.me/5581995665943
+Osmar Francisco	5581995015219	https://wa.me/5581995015219
+Analú Melo	5581996401371	https://wa.me/5581996401371
+Vanessa Vitoria dos Santos	5581999321309	https://wa.me/5581999321309
+David Wesley Ramos de Oliveira	5581995727226	https://wa.me/5581995727226
+Victor Luhan	5581985984089	https://wa.me/5581985984089
+Ana Lethycia Pereira	5581987170334	https://wa.me/5581987170334
+Diego*	5581996302651	https://wa.me/5581996302651
+Anderson Gomes da Silva	5581984589750	https://wa.me/5581984589750
+Bruna Rodrigues	5581995971118	https://wa.me/5581995971118
+Kayllane Gomes	5581984730813	https://wa.me/5581984730813
+Rinaldo Andrade	5581997192908	https://wa.me/5581997192908
+Vieiramiguel Oscar	5581995339153	https://wa.me/5581995339153
+Diogo Peixoto da Anunciação Amorim	5581979023977	https://wa.me/5581979023977
+Fernanda Marques	5581999328277	https://wa.me/5581999328277
+Gustavo Bruno	5579996319907	https://wa.me/5579996319907
+José Carlos	5581995005551	https://wa.me/5581995005551
+Stephanie Karla *vida real	5581996939004	https://wa.me/5581996939004
+Geraldo Santiago	5581986712021	https://wa.me/5581986712021
+Riquel Drumond	5581994910914	https://wa.me/5581994910914
+Júlia Valentina Nazário de Carvalho	5581992649170	https://wa.me/5581992649170
+Juliana Barbosa	5581984245642	https://wa.me/5581984245642
+Alexsandro Justino Sandro	5581984307315	https://wa.me/5581984307315
+Luciano Mendonça	5581984729954	https://wa.me/5581984729954
+Ewerton Fidélis	5581999653306	https://wa.me/5581999653306
+Iris Santos	5581996379848	https://wa.me/5581996379848
+Nicolle Silva	5581999022439	https://wa.me/5581999022439
+Daniela Oliveira	5581985678009	https://wa.me/5581985678009
+Onivaldo Malheiros	5581984289179	https://wa.me/5581984289179
+Aldecy Moura	5581987158808	https://wa.me/5581987158808
+Breno Gustavo	5581988158529	https://wa.me/5581988158529
+Andréa Martins	5581997028111	https://wa.me/5581997028111
+Tayhane Elizabeth	5581986614477	https://wa.me/5581986614477
+Waldenicio Tavares]	5581998781478	https://wa.me/5581998781478
+Raquel Albuquerque	5581997595329	https://wa.me/5581997595329
+Matheus Santos	5581986642126	https://wa.me/5581986642126
+Déborah Martins	5581997373346	https://wa.me/5581997373346
+Eman	5581996622597	https://wa.me/5581996622597
+Emeline Melo	5581981627018	https://wa.me/5581981627018
+Jéssica Souza	5581993844135	https://wa.me/5581993844135
+Carolina Galdino	5581985659414	https://wa.me/5581985659414
+Adriana Rodrigues	5581986183801	https://wa.me/5581986183801
+Felipe Henrique Santos de Brito	5581988278844	https://wa.me/5581988278844
+Rosberg	5581996665101	https://wa.me/5581996665101
+Jennifer Medeiros Soares	5581992384298	https://wa.me/5581992384298
+Ang	5581999560579	https://wa.me/5581999560579
+Ivanilton Junior	5581988427220	https://wa.me/5581988427220
+Jessica Karla	5581982667801	https://wa.me/5581982667801
+Rayrone-Carlos Ca	5581982474613	https://wa.me/5581982474613
+Eduarda Lourenço	5581987995137	https://wa.me/5581987995137
+Gabriel Ferreira	5581996841927	https://wa.me/5581996841927
+Nádia Ventura da Paixão	5581987740915	https://wa.me/5581987740915
+Maysa Sena	5581995432084	https://wa.me/5581995432084
+Mayara Lima	5581986625560	https://wa.me/5581986625560
+Kamylla Rubya	5581995144100	https://wa.me/5581995144100
+Elani Saldanha	5581991414554	https://wa.me/5581991414554
+Alice Eliza	5581983313250	https://wa.me/5581983313250
+Charlene Carla	5581998072891	https://wa.me/5581998072891
+Leticia Vieira	5581995191967	https://wa.me/5581995191967
+Mikaeli Costa	5581988334980	https://wa.me/5581988334980
+Joao Miguel	5581996648326	https://wa.me/5581996648326
+Gianni Bezerra	5581971077459	https://wa.me/5581971077459
+Célia Nobrega	5581998460811	https://wa.me/5581998460811
+Sheila Arruda	5581998968158	https://wa.me/5581998968158
+Denílson Gomes	5581973235771	https://wa.me/5581973235771
+Brenda Souza	5581993791605	https://wa.me/5581993791605
+Laura Emanuele	5581987659486	https://wa.me/5581987659486
+Beatriz Gabriely	5581988926069	https://wa.me/5581988926069
+Solange Arruda	5581986984607	https://wa.me/5581986984607
+Karolaine Milena	5581989319202	https://wa.me/5581989319202
+Candido Silva	5581999784822	https://wa.me/5581999784822
+Riandra Sousa	5581999994250	https://wa.me/5581999994250
+Maria Santana	5581985778629	https://wa.me/5581985778629
+Leylanne Domingos	5581994777139	https://wa.me/5581994777139
+Larissa Marques	5581996678073	https://wa.me/5581996678073
+Pyetra Lucena	5581991762569	https://wa.me/5581991762569
+Ezequiel Porfirio	5581991191094	https://wa.me/5581991191094
+Rute Queiroz	5581996544144	https://wa.me/5581996544144
+Deivson Silva	5581986766669	https://wa.me/5581986766669
+Anderson Lins	5581994419983	https://wa.me/5581994419983
+Hitalo Cesar	5581982924650	https://wa.me/5581982924650
+Miguel Gomes	5581986528282	https://wa.me/5581986528282
+Gleyce Moura	5581982651717	https://wa.me/5581982651717
+Quezia Letícia	5581994397086	https://wa.me/5581994397086
+Luciene de Oliveira Silva	5581985258441	https://wa.me/5581985258441
+Rosely Silva	5581973313932	https://wa.me/5581973313932
+Thalyta Kevilyn	5581981514301	https://wa.me/5581981514301
+Kayla Mendes	5581985406285	https://wa.me/5581985406285
+Beatriz Silva	5581991061737	https://wa.me/5581991061737
+Paulo e Rayssa	5581999482099	https://wa.me/5581999482099
+Bruno Viana	5581994614883	https://wa.me/5581994614883
+Julia Vitória	5581988700071	https://wa.me/5581988700071
+Raul Luiz Gonçalves da Silva	5581992835129	https://wa.me/5581992835129
+Paulo Junior	5581987000775	https://wa.me/5581987000775
+Suberlania Freire	5581999303477	https://wa.me/5581999303477
+Aline Avelino	5581987008929	https://wa.me/5581987008929
+Flavia Barros	5581989455290	https://wa.me/5581989455290
+Mariana Barbosa	5581973237515	https://wa.me/5581973237515
+Genilyn Gomes	5581992722409	https://wa.me/5581992722409
+If Ditoso	5579988697243	https://wa.me/5579988697243
+Camil Santos	5581997718042	https://wa.me/5581997718042
+Kaylany Clara	5581996801052	https://wa.me/5581996801052
+Marina Rosa	5581984087659	https://wa.me/5581984087659
+Robson Luiz	5581986450234	https://wa.me/5581986450234
+Roberta Maria Araujo Ramos Vilarim	5581999173979	https://wa.me/5581999173979
+Diego	558173249556	https://wa.me/558173249556
+Marcella Veiga	5581993209717	https://wa.me/5581993209717
+Ellen Duarte	5581993033561	https://wa.me/5581993033561
+Mariar José	5581995214723	https://wa.me/5581995214723
+Davi Gomes	5581985023966	https://wa.me/5581985023966
+Luiza Araújo	5581985325460	https://wa.me/5581985325460
+Maria Beatriz	5581985239419	https://wa.me/5581985239419
+Pablo Ruan	5581971112781	https://wa.me/5581971112781
+Raiane Augusta	5581987579580	https://wa.me/5581987579580
+Bárbara Brito	5581984357186	https://wa.me/5581984357186
+Sílvia Andréia	5581988880581	https://wa.me/5581988880581
+Leonio Lima	5581988733687	https://wa.me/5581988733687
+Pedro Valença	5581998333270	https://wa.me/5581998333270
+Mary Mirtes	5581993916037	https://wa.me/5581993916037
+Thaysa Priscilla	5581998289515	https://wa.me/5581998289515
+Andreza Lima	5581987715274	https://wa.me/5581987715274
+Diana Rodrigues	5581996228611	https://wa.me/5581996228611
+Lúcia Soares	558197803866	https://wa.me/558197803866
+Lídia R	5581995868483	https://wa.me/5581995868483
+Ediele Ewellen	5581988089305	https://wa.me/5581988089305
+Maria Luiza	5581994413457	https://wa.me/5581994413457
+Ana Vitória	5581984277997	https://wa.me/5581984277997
+Grasielly Sobrinho	5581989207967	https://wa.me/5581989207967
+Gabriella Souza	5581997055603	https://wa.me/5581997055603
+Bruna Santos	5581992071395	https://wa.me/5581992071395
+Guiga Pinheiro	5581994331083	https://wa.me/5581994331083
+Rayara Medeiros	5581991599583	https://wa.me/5581991599583
+Amanda Silva	5581994838534	https://wa.me/5581994838534
+Raul Souza	5581989001146	https://wa.me/5581989001146
+Charlene Albuquerque]	5581979147202	https://wa.me/5581979147202
+Roni Colerman	5581996352942	https://wa.me/5581996352942
+Ana Cristina	5581988981517	https://wa.me/5581988981517
+Wevinny Alice	5581991097373	https://wa.me/5581991097373
+Naila Raira	5581992978742	https://wa.me/5581992978742
+Maria Heloysa	5581989889562	https://wa.me/5581989889562
+Taina Correia	5581971202049	https://wa.me/5581971202049
+Paulo Levy Xavier	5545991176663	https://wa.me/5545991176663
+Rodrigo Daniel de Souza Lima	5581988853193	https://wa.me/5581988853193
+Veronica Silva	5581998718497	https://wa.me/5581998718497
+Larissa Lima	5581994427177	https://wa.me/5581994427177
+Sarah Lira Santos	5581981785552	https://wa.me/5581981785552
+Viviane Menezes	5581983032185	https://wa.me/5581983032185
+Vanessa Lopes	5581973245965	https://wa.me/5581973245965
+Duda Silva	5581971148066	https://wa.me/5581971148066
+Hermes Tavares	5581986522075	https://wa.me/5581986522075
+Gabriela Silva	5581983344881	https://wa.me/5581983344881
+Valdemir Batista	5581979045484	https://wa.me/5581979045484
+José Ricardo dos Anjos da Fonseca	5581987680009	https://wa.me/5581987680009
+Lukas Matheus	5581997914388	https://wa.me/5581997914388
+Vinicius Santana Ramos	5581984132970	https://wa.me/5581984132970
+Ezequias Moura	5581988871870	https://wa.me/5581988871870
+Luiz França	5581996620011	https://wa.me/5581996620011
+Diogo Melo	5581999325988	https://wa.me/5581999325988
+Andrely Soares	5581986631752	https://wa.me/5581986631752
+Ryshesile Gabriela	5581983581297	https://wa.me/5581983581297
+Mariana Vitoria	5581984117735	https://wa.me/5581984117735
+Ilkyaer Barros	5581999093651	https://wa.me/5581999093651
+Jean Jose Teixeira de Santana	5581984117858	https://wa.me/5581984117858
+Rodrigo Leite	5583987222260	https://wa.me/5583987222260
+Jeize Rarin	5581993061314	https://wa.me/5581993061314
+Weberth Alencar	5521995698704	https://wa.me/5521995698704
+Aline Luz Gil	5581999270030	https://wa.me/5581999270030
+Maria Luiza	5581986177791	https://wa.me/5581986177791
+Lavínnya Hillary	558195330369	https://wa.me/558195330369
+Danielle Mendonça	5581985446327	https://wa.me/5581985446327
+Ana Cristina Silva Lima	5581988540726	https://wa.me/5581988540726
+Lynecker Matheus Batista Ferreira	5581982900444	https://wa.me/5581982900444
+Tassiana	5581985834224	https://wa.me/5581985834224
+Taina Taina	5511949013503	https://wa.me/5511949013503
+Charles Oliveira	5581981712153	https://wa.me/5581981712153
+Cynthia Alves	5581984921273	https://wa.me/5581984921273
+Sergio Claudino	5581997541951	https://wa.me/5581997541951
+Diego Santos	5581984312464	https://wa.me/5581984312464
+Bruna França	558197938095	https://wa.me/558197938095
+Cláudio de Albuquerque	5581982513399	https://wa.me/5581982513399
+Gutemberg oliveira	5581989397257	https://wa.me/5581989397257
+Willy nascimento	5581988733387	https://wa.me/5581988733387
+Petrucio alves	558198493614	https://wa.me/558198493614
+Teresa Cristina	558195638040	https://wa.me/558195638040
+Fabiana cocri	5581998845084	https://wa.me/5581998845084
+Gabriela Alves	5581983455321	https://wa.me/5581983455321
+Bia	5581987088707	https://wa.me/5581987088707
+Joana Joaquim	558184463830	https://wa.me/558184463830
+Pedro	558198522387	https://wa.me/558198522387
+Alzineide	5581987270974	https://wa.me/5581987270974
+Maria Eduarda luz	5581984695370	https://wa.me/5581984695370
+Ana Silva	5581997639733	https://wa.me/5581997639733
+Júlia Arraes Sampaio	5581999282556	https://wa.me/5581999282556
+Gabriel Manoel	5581986211875	https://wa.me/5581986211875
+Jakelayne Albertini	5581987018223	https://wa.me/5581987018223
+Jéssica Oliveira	5581988576621	https://wa.me/5581988576621
+Rayanna Xavier	5581983639281	https://wa.me/5581983639281
+Isabela Lopes	5581997544932	https://wa.me/5581997544932
+Well Assis	5581983014243	https://wa.me/5581983014243
+Saulo Albert	5581986739435	https://wa.me/5581986739435
+Isabelle lima	5581987544711	https://wa.me/5581987544711
+Thiago Alves Marques	5581998905451	https://wa.me/5581998905451
+Michele Aguiar	5584999000979	https://wa.me/5584999000979
+Ewerton Felipe	558198688755	https://wa.me/558198688755
+Ana Karla	5581987674956	https://wa.me/5581987674956
+Willaneyde	5581985508454	https://wa.me/5581985508454
+Paulo Sérgio	5581995188718	https://wa.me/5581995188718
+Barbara Bianca	5581984612239	https://wa.me/5581984612239
+Keylla kelllma	5581987285303	https://wa.me/5581987285303
+Bielmichereff	559982188388	https://wa.me/559982188388
+Natália Silva	5581986449747	https://wa.me/5581986449747
+Deilton Silva	5581985495726	https://wa.me/5581985495726
+Felipe José	5581984315510	https://wa.me/5581984315510
+Andrea Cristina	5581988543642	https://wa.me/5581988543642
+Adriana Maria	558198519679	https://wa.me/558198519679
+Monica Martins	5581998095699	https://wa.me/5581998095699
+David Fernandes	5581995123910	https://wa.me/5581995123910
+Roberta uber	5581983127079	https://wa.me/5581983127079
+Cleyton	5581995212209	https://wa.me/5581995212209
+Tawani	5581984853590	https://wa.me/5581984853590
+Bruna Vasconcelos	5581981769653	https://wa.me/5581981769653
+Aline	5581985184941	https://wa.me/5581985184941
+Arthur Felipe	5581987909994	https://wa.me/5581987909994
+Brasil free fire	5581987546711	https://wa.me/5581987546711
+Karol Bulhões	5581981340735	https://wa.me/5581981340735
+Raiane lemos	5581995330456	https://wa.me/5581995330456
+(Cliente de Caio)	5581983586748	https://wa.me/5581983586748
+Quitiane	558188814782	https://wa.me/558188814782
+João Flávio Barbosa	5581988510410	https://wa.me/5581988510410
+Katiucia	558198976750	https://wa.me/558198976750
+Karla margarida	5581987987636	https://wa.me/5581987987636
+Allana	5581991227397	https://wa.me/5581991227397
+Vinícius monteiro	5581996951889	https://wa.me/5581996951889
+Tacyara Nunes	5581984118441	https://wa.me/5581984118441
+Kriska carneiro	5581999885733	https://wa.me/5581999885733
+Danielle Barbosa	5581982752911	https://wa.me/5581982752911
+Luciana	5581996151641	https://wa.me/5581996151641
+Diana ramos	5581981835112	https://wa.me/5581981835112
+Hugo legítimo	5581984722025	https://wa.me/5581984722025
+Marília Rayane	5581996001588	https://wa.me/5581996001588
+Filipe Liberato	5581999974144	https://wa.me/5581999974144
+Jane Souza	5581987564331	https://wa.me/5581987564331
+Antônia Salete	5581997649824	https://wa.me/5581997649824
+Elisabete Alcântara	559999893162	https://wa.me/559999893162
+Darleny Ferreira	5581991271428	https://wa.me/5581991271428
+Ruan	5581988918286	https://wa.me/5581988918286
+Vitória Roberta	5581984616817	https://wa.me/5581984616817
+Marília Fernanda	5581983844246	https://wa.me/5581983844246
+Nivaldo dias	5581985016726	https://wa.me/5581985016726
+Reuson vieira	5581992633175	https://wa.me/5581992633175
+João Gonçalves	558199676872	https://wa.me/558199676872
+Jymmy	5581997746237	https://wa.me/5581997746237
+Nycollaz	5581995123282	https://wa.me/5581995123282
+Paulo Emílio	5581996998879	https://wa.me/5581996998879
+Karina Costa	5581997827343	https://wa.me/5581997827343
+Alex da Silva	5581999433249	https://wa.me/5581999433249
+Barbara Uber	5581994424295	https://wa.me/5581994424295
+Marina	5581989223154	https://wa.me/5581989223154
+Klebson	5581971128571	https://wa.me/5581971128571
+Janaina Costa	5581983468727	https://wa.me/5581983468727
+Juliana dias	5581984928720	https://wa.me/5581984928720
+Victoria Guilherme	5581996705376	https://wa.me/5581996705376
+Jessica buriti	5581991620072	https://wa.me/5581991620072
+Danielle Araújo	5581989580848	https://wa.me/5581989580848
+Rose sobral	5581995567703	https://wa.me/5581995567703
+Fernanda m	5581987114159	https://wa.me/5581987114159
+Monique Marques	5581996809716	https://wa.me/5581996809716
+Isabela nascimento	5581997424099	https://wa.me/5581997424099
+Estefaby vitória	5581985168215	https://wa.me/5581985168215
+Felipe Oliveira	5581991099915	https://wa.me/5581991099915
+Eduarda Dornelles	5581998839327	https://wa.me/5581998839327
+Rosana Lacerda	5581988186524	https://wa.me/5581988186524
+João Carlos	5581987033735	https://wa.me/5581987033735
+Rony Ferrer	5581993325678	https://wa.me/5581993325678
+Mayck Silva	5581995134694	https://wa.me/5581995134694
+Monalisa	5581996894716	https://wa.me/5581996894716
+Antony Santos	5581998839983	https://wa.me/5581998839983
+Cássio armando	558184745079	https://wa.me/558184745079
+João Pedro	5581993062391	https://wa.me/5581993062391
+Felipe brignardrllo	5581996190986	https://wa.me/5581996190986
+Lucas Alves	5581996215772	https://wa.me/5581996215772
+Juliana valle	5581984831055	https://wa.me/5581984831055
+Rafael Sá	5581994428015	https://wa.me/5581994428015
+Amanda Santos	5581985608586	https://wa.me/5581985608586
+Gisele woooley	5581998743206	https://wa.me/5581998743206
+Letícia Santiago	5581998710382	https://wa.me/5581998710382
+Bianca Nunes	5581984758504	https://wa.me/5581984758504
+Áurea Medeiros	5581999051639	https://wa.me/5581999051639
+Diogo Mota	5581986680130	https://wa.me/5581986680130
+Morgana Mayra	558199002110	https://wa.me/558199002110
+Cristiano Alexandre	5581997705414	https://wa.me/5581997705414
+Davy Souza	5581983148302	https://wa.me/5581983148302
+Lucas falcão	5581985518191	https://wa.me/5581985518191
+Marcos	5581984904583	https://wa.me/5581984904583
+Nayane vitória	5583998584028	https://wa.me/5583998584028
+Jefferson Santos	5581982148983	https://wa.me/5581982148983
+Letícia Almeida	5581987101458	https://wa.me/5581987101458
+Melissa	5581988024534	https://wa.me/5581988024534
+Elias Luiz da Silva	5581981965519	https://wa.me/5581981965519
+Maria José	5581992039506	https://wa.me/5581992039506
+Leo nardo	5581983585202	https://wa.me/5581983585202
+Douglas correria	5581991058754	https://wa.me/5581991058754
+Rian Matias	5581992841106	https://wa.me/5581992841106
+Aline	5581983231286	https://wa.me/5581983231286
+Daniela Souza	5581986734585	https://wa.me/5581986734585
+Rebeca Torres	5581984849828	https://wa.me/5581984849828
+Junior Silva	5581997248829	https://wa.me/5581997248829
+Gleiciani Maria	5581987005404	https://wa.me/5581987005404
+Priscila Albuquerque	5581985690532	https://wa.me/5581985690532
+Suzany Cristina	5581989452451	https://wa.me/5581989452451
+, ama da Macedo	5581999877520	https://wa.me/5581999877520
+Edilene li	5581991803922	https://wa.me/5581991803922
+Rene	5581981571727	https://wa.me/5581981571727
+Audineude	5581984587639	https://wa.me/5581984587639
+Angélica	5581983344212	https://wa.me/5581983344212
+Deyvson Freitas	5581983643967	https://wa.me/5581983643967
+José Rodrigues	5581995026851	https://wa.me/5581995026851
+Johnanthan armando	5581988660116	https://wa.me/5581988660116
+Melanie Menezes	5581985277300	https://wa.me/5581985277300
+Vinicius Nascimento	5581987653766	https://wa.me/5581987653766
+Izabel Ribeiro	5581986753503	https://wa.me/5581986753503
+Luiz Caio	5581988914276	https://wa.me/5581988914276
+Lilian Silva	5581984564982	https://wa.me/5581984564982
+Chibinha	5581993502386	https://wa.me/5581993502386
+Mônica	558182766149	https://wa.me/558182766149
+Ednaldo Luis	5581988318853	https://wa.me/5581988318853
+Andrea Lima	558183363052	https://wa.me/558183363052
+Milenna Xavier	5581994262195	https://wa.me/5581994262195
+Martina	5581984493410	https://wa.me/5581984493410
+Marliete	558196178388	https://wa.me/558196178388
+Carlos Gabriel	5581984457643	https://wa.me/5581984457643
+Diego bandeira	5581983674377	https://wa.me/5581983674377
+Douglas Rafael	5581985312446	https://wa.me/5581985312446
+Victor Leonardo	5581998021051	https://wa.me/5581998021051
+Kachi ff	5581985010603	https://wa.me/5581985010603
+Stevson Victor	559986582245	https://wa.me/559986582245
+Gabriel Soares	5581999296184	https://wa.me/5581999296184
+Leyka thay	5581983186136	https://wa.me/5581983186136
+Elisângela fragoso	5581993077825	https://wa.me/5581993077825
+Wellington Silva	5581986229905	https://wa.me/5581986229905
+Andesin Ferreira	5581996814519	https://wa.me/5581996814519
+Ícaro Matheus	5581987382531	https://wa.me/5581987382531
+Silvio Pessoa	5581984749331	https://wa.me/5581984749331
+Gicarla	5581983438577	https://wa.me/5581983438577
+Myllah vergenes	5581983504279	https://wa.me/5581983504279
+Carol Silva	5581986427597	https://wa.me/5581986427597
+Manoel José	5581986329067	https://wa.me/5581986329067
+Tiago Simões	5581996385493	https://wa.me/5581996385493
+Thuane	5581984189676	https://wa.me/5581984189676
+Katarina Neves	5581999344573	https://wa.me/5581999344573
+Rodrigo oliveeiraa	5581986058440	https://wa.me/5581986058440
+Ivoneide Souza	5581985915670	https://wa.me/5581985915670
+Artur romano08	5581983554872	https://wa.me/5581983554872
+Ana beatriz	5581986183676	https://wa.me/5581986183676
+Carolina amâncio	5581983071667	https://wa.me/5581983071667
+Junnoo	5581984666876	https://wa.me/5581984666876
+Maykon alcantara	558198444194	https://wa.me/558198444194
+Erika cavalcante	5581994239620	https://wa.me/5581994239620
+Ari gemes	5581997983612	https://wa.me/5581997983612
+Ana Beatriz	5581984211405	https://wa.me/5581984211405
+Rúbia	5581973056682	https://wa.me/5581973056682
+Lois	5581999677720	https://wa.me/5581999677720
+Maria Júlia uber	5581984040623	https://wa.me/5581984040623
+Jannaize	5581983479066	https://wa.me/5581983479066
+Rodrigo Carvalho	5581998911923	https://wa.me/5581998911923
+Aline Fabiana	5581984602083	https://wa.me/5581984602083
+Issaque	558184179543	https://wa.me/558184179543
+Larissa	5581987021982	https://wa.me/5581987021982
+Dantas	5581997509735	https://wa.me/5581997509735
+Edilza	558186517261	https://wa.me/558186517261
+Júnior Diomício	5581833344212	https://wa.me/5581833344212
+Andrea Lopes	558198405593	https://wa.me/558198405593
+Jéssica paz uber	558197707029	https://wa.me/558197707029
+Érica personalizado	5581989410601	https://wa.me/5581989410601
+Heloísa	5581997000279	https://wa.me/5581997000279
+Clayton Otávio	5581984832764	https://wa.me/5581984832764
+Ricardo Elias	5581986199178	https://wa.me/5581986199178
+Isabela Rodrigues	5581986828649	https://wa.me/5581986828649
+Tarciane Guimarães	5581988220375	https://wa.me/5581988220375
+Cintia Silva	5581995314274	https://wa.me/5581995314274
+Hannah M Fernandez	5581985252672	https://wa.me/5581985252672
+Clebson resevelte	5581987286579	https://wa.me/5581987286579
+Elaine dydonny	5581995642864	https://wa.me/5581995642864
+David Gustavo	5581985207302	https://wa.me/5581985207302
+Julio César	5581987073326	https://wa.me/5581987073326
+Pinheiro	5581983674140	https://wa.me/5581983674140
+Emmanuelly rebekca	5581995550068	https://wa.me/5581995550068
+Ruan Santos	5581987438895	https://wa.me/5581987438895
+Alecio dantas	5581992793258	https://wa.me/5581992793258
+Victor Montenegro	5581988215660	https://wa.me/5581988215660
+Izaias Ribeiro	5581983231516	https://wa.me/5581983231516
+Nilly pontual	5581995338482	https://wa.me/5581995338482
+Wallet Cavalcanti	5581992743047	https://wa.me/5581992743047
+Ana Silva	5581989323606	https://wa.me/5581989323606
+Davyd Gabriel	5581988512888	https://wa.me/5581988512888
+Gabrielly	5581983270369	https://wa.me/5581983270369
+Rayssa evelyn	5581988649873	https://wa.me/5581988649873
+Edelvira	5581986571256	https://wa.me/5581986571256
+Amilton mora	5581983248105	https://wa.me/5581983248105
+Emily	5581986034852	https://wa.me/5581986034852
+José	5581986256157	https://wa.me/5581986256157
+Ricardo Menezes	5581983003854	https://wa.me/5581983003854
+José Felipe	5581996977138	https://wa.me/5581996977138
+Anderso f s	5581998642954	https://wa.me/5581998642954
+Marcelo Pedro	5581988593206	https://wa.me/5581988593206
+Karina Silva	5581985494546	https://wa.me/5581985494546
+Maranhão Melo	5581995900859	https://wa.me/5581995900859
+Cristiane Melo	5581999528928	https://wa.me/5581999528928
+Rayanne Oliveira	5581995972704	https://wa.me/5581995972704
+Mariana Santos	5581987503947	https://wa.me/5581987503947
+Mônica vanessa	5581981442331	https://wa.me/5581981442331
+Anny Xavier	5581984337965	https://wa.me/5581984337965
+Larissa Alcântara	5581985640855	https://wa.me/5581985640855
+Juliana severiano	5581985986263	https://wa.me/5581985986263
+Ana Paula	5581996657601	https://wa.me/5581996657601
+Allyce vitória	5581985010264	https://wa.me/5581985010264
+Aldo Barros	5581998943768	https://wa.me/5581998943768
+Adrielly	5581982675698	https://wa.me/5581982675698
+Ludmilla evelin	5581985552776	https://wa.me/5581985552776
+Lanny Castro	5581997492730	https://wa.me/5581997492730
+Lulu Santos	5581984764104	https://wa.me/5581984764104
+Mateeus rei lobo	5581985635839	https://wa.me/5581985635839
+Rayssa caroline	5581983392872	https://wa.me/5581983392872
+Gustavo	5581984236527	https://wa.me/5581984236527
+Victoria mendes	558184976426	https://wa.me/558184976426
+Edinalva Maria	5581983458991	https://wa.me/5581983458991
+Milena	5581984115198	https://wa.me/5581984115198
+Emily Camile	5581971046413	https://wa.me/5581971046413
+Marcelo Uber	5581986253391	https://wa.me/5581986253391
+Benício Hudson	5581997097189	https://wa.me/5581997097189
+Taciana Silva	5581989998534	https://wa.me/5581989998534
+Carol Isarelly	5581991965266	https://wa.me/5581991965266
+Ari Souza	5581986923778	https://wa.me/5581986923778
+Lara Rocha	5581982762535	https://wa.me/5581982762535
+Carlos ab	558197368518	https://wa.me/558197368518
+Lays Silva	5581979061215	https://wa.me/5581979061215
+Beatriz Victoria	5581986242845	https://wa.me/5581986242845
+Vando Biel	5581985925270	https://wa.me/5581985925270
+Thaynã Martins	5581996749394	https://wa.me/5581996749394
+Wesley Silva	5581981372404	https://wa.me/5581981372404
+Henrique Anselmo	5581989020255	https://wa.me/5581989020255
+Vítor rian	5581984348215	https://wa.me/5581984348215
+Carlos souza	5581992299445	https://wa.me/5581992299445
+Rebeka Isabelle	5581986513823	https://wa.me/5581986513823
+Gabryel	5581984250442	https://wa.me/5581984250442
+Ewerton Santos	5581987919953	https://wa.me/5581987919953
+Karina	5581996198276	https://wa.me/5581996198276
+Elizabeth Honório	5581988648763	https://wa.me/5581988648763
+Mundo Dos Games	5581985013932	https://wa.me/5581985013932
+Matheus Silva	5581988572699	https://wa.me/5581988572699
+Emmanuela de Souza	5581984669050	https://wa.me/5581984669050
+Arthur Castro	5581996418210	https://wa.me/5581996418210
+Luana	5581986052475	https://wa.me/5581986052475
+Luciano Pereira	5581986231820	https://wa.me/5581986231820
+Lais lopes	5581981503211	https://wa.me/5581981503211
+Vini Gomes	5581999120997	https://wa.me/5581999120997
+Gilsarah Felix	5581983054785	https://wa.me/5581983054785
+Kleyton Gerlan	5581979031581	https://wa.me/5581979031581
+Thiago Rodrigues	5581996623594	https://wa.me/5581996623594
+Bilu Tata	5581995489425	https://wa.me/5581995489425
+Marcionila Nunes	5581996680984	https://wa.me/5581996680984
+Mucio Vasconcelos	5581988857952	https://wa.me/5581988857952
+Veronica Andrade	5581995727444	https://wa.me/5581995727444
+Jane França	5581983520779	https://wa.me/5581983520779
+Renata Cordeiro	5581988841728	https://wa.me/5581988841728
+Drian Grant	5581993784046	https://wa.me/5581993784046
+Diego Pereira	5581985572719	https://wa.me/5581985572719
+Sthefanye Silva	5581999335177	https://wa.me/5581999335177
+Bob O Bobo	5581985991238	https://wa.me/5581985991238
+Bruna Rafaelly	5581985477760	https://wa.me/5581985477760
+João Lucas Soares De Lima	5581983342499	https://wa.me/5581983342499
+Robson Gimar Santana Junior	5581983167930	https://wa.me/5581983167930
+Margarida Alves	5581992637179	https://wa.me/5581992637179
+Patricia Hollanda	5581994268116	https://wa.me/5581994268116
+Quezia Gomes	5581996567374	https://wa.me/5581996567374
+Uzany Gomes	5581986402204	https://wa.me/5581986402204
+Natasha Suenny	5581988755965	https://wa.me/5581988755965
+Diego Barbosa Mota	5581998103613	https://wa.me/5581998103613
+Figueiredo Marcilio	5581999222700	https://wa.me/5581999222700
+Ligia Santos	5581996191567	https://wa.me/5581996191567
+Maria De Fátima Borborema Da Silva Lima	5581987481232	https://wa.me/5581987481232
+Andrea Cipriano Do Nascimento	5581987166665	https://wa.me/5581987166665
+Jaime Barbosa	5581998831908	https://wa.me/5581998831908
+Gisleide Oliveira	5581995247108	https://wa.me/5581995247108
+Lucas Ricardo	5581998261971	https://wa.me/5581998261971
+Dioni Oliveira	5565981368667	https://wa.me/5565981368667
+Luana Rodrigues	5581986736669	https://wa.me/5581986736669
+Evelyn T. Autran	5581984279189	https://wa.me/5581984279189
+Pedro Cândido	5581993877124	https://wa.me/5581993877124
+Junior Ferreira	5581997339654	https://wa.me/5581997339654
+Eliana Maria	5581984869888	https://wa.me/5581984869888
+Carla Fernanda Felix Aguiar	5581991238366	https://wa.me/5581991238366
+Marilia Santos	5581984425469	https://wa.me/5581984425469
+Carla Marcelina	5581987645525	https://wa.me/5581987645525
+Murilo Vasconcelos	5581988542598	https://wa.me/5581988542598
+Luiz Henrick	5581988120955	https://wa.me/5581988120955
+Laynner Santos	5581981114689	https://wa.me/5581981114689
+Diego Souza	5581993805173	https://wa.me/5581993805173
+Carlos André	5581992082533	https://wa.me/5581992082533
+Adriana Silva	5581987999926	https://wa.me/5581987999926
+Nayara Victória	5581985267198	https://wa.me/5581985267198
+Felipe José Dos Santos Carneiro	5581986036015	https://wa.me/5581986036015
+Érica Gonzaga	5581985709154	https://wa.me/5581985709154
+Vitória Azevedo	5581988387284	https://wa.me/5581988387284
+Augusto Cesar	5581994211407	https://wa.me/5581994211407
+Bruna Patrícia	5581983387253	https://wa.me/5581983387253
+Thalia	5581987980581	https://wa.me/5581987980581
+Gredson Magno	5581983665021	https://wa.me/5581983665021
+Vera Lúcia Amorim	5581999796686	https://wa.me/5581999796686
+Douglas Soares	5581997184305	https://wa.me/5581997184305
+Jefferson Seijuro	5581984471494	https://wa.me/5581984471494
+André Nascimento	5581991484972	https://wa.me/5581991484972
+Mari Martins	5581983225606	https://wa.me/5581983225606
+Alice	5581997616342	https://wa.me/5581997616342
+Yasmin Barros	5581984160441	https://wa.me/5581984160441
+Vidal Lima	5581999267560	https://wa.me/5581999267560
+Jefferson Cavalcanti	5581987086338	https://wa.me/5581987086338
+Acsa Silva	5581985492626	https://wa.me/5581985492626
+Diego Melo	5581986237644	https://wa.me/5581986237644
+Maisa Costa	5581995297559	https://wa.me/5581995297559
+Marcos Vinicios	5581985341484	https://wa.me/5581985341484
+Larissa Bravo	5554996916990	https://wa.me/5554996916990
+Geovana Sobral	5581994286069	https://wa.me/5581994286069
+Andrea Andrade	5581991640252	https://wa.me/5581991640252
+Gustavo Vicente	5581997054920	https://wa.me/5581997054920
+Kelly Cristina	5581997507866	https://wa.me/5581997507866
+Ian Victor	558198701458	https://wa.me/558198701458
+Laura Fabiana	5581973027140	https://wa.me/5581973027140
+Larissa Rodrigues	5581985553870	https://wa.me/5581985553870
+Rodrigo Santos crikslaien	5581983484161	https://wa.me/5581983484161
+Rafaela Evila	5581986002349	https://wa.me/5581986002349
+Karolyne	5581989750221	https://wa.me/5581989750221
+Giovanna Campelo	5581984457930	https://wa.me/5581984457930
+Fernanda F.	5581983082915	https://wa.me/5581983082915
+Érika Carneiro	5581997370509	https://wa.me/5581997370509
+Yuri Santos	5588998169235	https://wa.me/5588998169235
+Pierre	5581996939531	https://wa.me/5581996939531
+Paulo Henrique	5581998123868	https://wa.me/5581998123868
+Matheus Silva	5581982509137	https://wa.me/5581982509137
+Milka	5581996777141	https://wa.me/5581996777141
+Lizi	558199493489	https://wa.me/558199493489
+Aline Cristina	5581988031785	https://wa.me/5581988031785
+Eto lima	5581988501011	https://wa.me/5581988501011
+Yasmym	5581995947236	https://wa.me/5581995947236
+Kelly	5581983516532	https://wa.me/5581983516532
+Marcelo Marques	5581995363548	https://wa.me/5581995363548
+Deyse Lopes	5581994745343	https://wa.me/5581994745343
+Nayale	5581992168588	https://wa.me/5581992168588
+Raquel pessoa Vieira	5581985112867	https://wa.me/5581985112867
+Dyego Aragão	5581994827638	https://wa.me/5581994827638
+Fabrício Souza	5581989581008	https://wa.me/5581989581008
+Mylla	5581983071567	https://wa.me/5581983071567
+Karla Khristiane	5581991911862	https://wa.me/5581991911862
+Tarcyla	5581996773176	https://wa.me/5581996773176
+Maria Eduarda	5581988976076	https://wa.me/5581988976076
+João Gonçalves	5581999827795	https://wa.me/5581999827795
+João Vítor	5581986837733	https://wa.me/5581986837733
+Antônio derec	5581986337761	https://wa.me/5581986337761
+Bianca Lopes	5581995230858	https://wa.me/5581995230858
+Neidjane	5581986320340	https://wa.me/5581986320340
+Mateus Gomes	5581993201519	https://wa.me/5581993201519
+João neto	558199126505	https://wa.me/558199126505
+Rodrigo Andrade	5581986587924	https://wa.me/5581986587924
+Steven Cardoso	5581995064409	https://wa.me/5581995064409
+Arthur game	5581995630823	https://wa.me/5581995630823
+Bruna nemen	5581984311549	https://wa.me/5581984311549
+Giselle França	5581997235577	https://wa.me/5581997235577
+Monique silva	558195230858	https://wa.me/558195230858
+Henrique Pedrosa	5581971204949	https://wa.me/5581971204949
+allan herbert	5581982067055	https://wa.me/5581982067055
+Allyson Oliveira	5581986750270	https://wa.me/5581986750270
+Cássio Neves	5581988237937	https://wa.me/5581988237937
+Kaua Costa	5581984534183	https://wa.me/5581984534183
+Dayane Batista	5581988143326	https://wa.me/5581988143326
+Paulo moreno	5581991260119	https://wa.me/5581991260119
+Lucas Ribeiro	5581994015819	https://wa.me/5581994015819
+Ana mary	558199117823	https://wa.me/558199117823
+Maria Castro	5581999120401	https://wa.me/5581999120401
+Lucas	5581993350009	https://wa.me/5581993350009
+Thiago	5581987122666	https://wa.me/5581987122666
+Rosa Maria	5581988838707	https://wa.me/5581988838707
+Creci	5581998448948	https://wa.me/5581998448948
+Kevin Tj	5581988156550	https://wa.me/5581988156550
+Wilbert Dallas3	5581986818599	https://wa.me/5581986818599
+Maria Esther	5581985677377	https://wa.me/5581985677377
+Helio Mota	5581993201060	https://wa.me/5581993201060
+Carlos	5581999929535	https://wa.me/5581999929535
+Rafaely Silva	5581988103052	https://wa.me/5581988103052
+Patrícia	5581994211724	https://wa.me/5581994211724
+Diário	5581995391914	https://wa.me/5581995391914
+Igor Santos	5581991402957	https://wa.me/5581991402957
+Ivaneide	5581984586832	https://wa.me/5581984586832
+Heitor Tavares	5581999701512	https://wa.me/5581999701512
+Victoria nascimento	5581988555758	https://wa.me/5581988555758
+Caio Constantino	5581973141693	https://wa.me/5581973141693
+Yasmin vitória	5581984284571	https://wa.me/5581984284571
+Claudia chaves	5581987478176	https://wa.me/5581987478176
+Marcod Vinicius	5581994985350	https://wa.me/5581994985350
+Jefferson Douglas	5581986227657	https://wa.me/5581986227657
+Juliane falcão	5581988476709	https://wa.me/5581988476709
+Daniela fabricia	5581996421472	https://wa.me/5581996421472
+Paulo Gustavo	5581984293335	https://wa.me/5581984293335
+wiegandt	5581999217532	https://wa.me/5581999217532
+Gdudh	5581985596665	https://wa.me/5581985596665
+Carlos José	5581988515882	https://wa.me/5581988515882
+Vitória França	558198551785	https://wa.me/558198551785
+Arnaldo Carlos	5581999486398	https://wa.me/5581999486398
+Sávio Henrique	5581991205830	https://wa.me/5581991205830
+Simone chacon	5581986647494	https://wa.me/5581986647494
+Cibele Caetano	5581999036662	https://wa.me/5581999036662
+Albert Leonardo	5581987800094	https://wa.me/5581987800094
+Davi Olívio	5581988221216	https://wa.me/5581988221216
+Paloma Eduarda	5581996322556	https://wa.me/5581996322556
+Gricia Barbosa	5581988933631	https://wa.me/5581988933631
+Mariana	5581996990767	https://wa.me/5581996990767
+Tamires Alves	5581984887490	https://wa.me/5581984887490
+Maria graças	5581999497249	https://wa.me/5581999497249
+Suzana karla	5581986941444	https://wa.me/5581986941444
+Caroline fontão	5581996721046	https://wa.me/5581996721046
+Camila patriota	558195108723	https://wa.me/558195108723
+Monica Cipriano	5581987111401	https://wa.me/5581987111401
+Davi Alexandre	5581999036435	https://wa.me/5581999036435
+Isabela Florêncio	5581998781290	https://wa.me/5581998781290
+Amanda Santos	5581997818555	https://wa.me/5581997818555
+Fernanda lima	5581899877471	https://wa.me/5581899877471
+Maycon Ferreira	5581987921872	https://wa.me/5581987921872
+Carlos Fernando Alfredo	5581979136716	https://wa.me/5581979136716
+Pierre Gomes	5581996161890	https://wa.me/5581996161890
+Lays Cavalcanti	5581995967426	https://wa.me/5581995967426
+Kethelly	5581988197784	https://wa.me/5581988197784
+David brayner	5581884278668	https://wa.me/5581884278668
+Jonas Henrique	5581973125839	https://wa.me/5581973125839
+ícaro França	5581986100361	https://wa.me/5581986100361
+Josè caua	5581985515851	https://wa.me/5581985515851
+Alex Ferreira	5581987615238	https://wa.me/5581987615238
+Juliana Maria	5581995275609	https://wa.me/5581995275609
+Manoela Santana	5581994442479	https://wa.me/5581994442479
+Caroline lima	5581997080624	https://wa.me/5581997080624
+Júlia prates	5581999416016	https://wa.me/5581999416016
+Rafael falcão	5581986059097	https://wa.me/5581986059097
+Fabiana Patrícia	5581984430045	https://wa.me/5581984430045
+Thaysa farias	5581984843848	https://wa.me/5581984843848
+Ketuly ronne	5581986845173	https://wa.me/5581986845173
+Édson nota	5581985245836	https://wa.me/5581985245836
+Thayza	5581998613711	https://wa.me/5581998613711
+Danyela	5581994587734	https://wa.me/5581994587734
+Maurício leite	5581997742326	https://wa.me/5581997742326
+Pedro Pl	5581983093822	https://wa.me/5581983093822
+Diane rufino	5581993801400	https://wa.me/5581993801400
+Fabiane Ferreira	5581984100976	https://wa.me/5581984100976
+Eduardo Chris	5581986095383	https://wa.me/5581986095383
+Bruno thyago	5581997626505	https://wa.me/5581997626505
+Renan Rodrigues	5581984600533	https://wa.me/5581984600533
+Dayane Ferreira	5581988632596	https://wa.me/5581988632596
+Rose brayner	5581987085992	https://wa.me/5581987085992
+Well Assis	558193014243	https://wa.me/558193014243
+Nayara Carneiro	558198693518	https://wa.me/558198693518
+B. Nnn.	5581988878419	https://wa.me/5581988878419
+Paula Ferreira	5581988245072	https://wa.me/5581988245072
+Anderson silva	5581985070122	https://wa.me/5581985070122
+Vaneide Jerônimo	5581988387485	https://wa.me/5581988387485
+Manoel silva	5581984364322	https://wa.me/5581984364322
+Laís Maria	5581987004147	https://wa.me/5581987004147
+Israel Duarte	5581993024501	https://wa.me/5581993024501
+Ayron Henrique	5581984597937	https://wa.me/5581984597937
+Weltmam Gomes	5581987006513	https://wa.me/5581987006513
+Leonardo Fonseca	5581986794756	https://wa.me/5581986794756
+Monica marinho	5581984462234	https://wa.me/5581984462234
+Amanda Oliveira	5581985693632	https://wa.me/5581985693632
+Édson	5588988035121	https://wa.me/5588988035121
+Maria Lourdes	5581984043941	https://wa.me/5581984043941
+Letícia briza	5581887024394	https://wa.me/5581887024394
+Patrícia pães	5581985336939	https://wa.me/5581985336939
+Winny	5581884475095	https://wa.me/5581884475095
+Jéssica natacha	5581986103910	https://wa.me/5581986103910
+Clisaldo plugueser	5581993615151	https://wa.me/5581993615151
+elexsandro Matheus	5581986368673	https://wa.me/5581986368673
+Vitória lorrany	5581984589889	https://wa.me/5581984589889
+Eduarda Soares	5581984528491	https://wa.me/5581984528491
+Marluce Maria	5581985993332	https://wa.me/5581985993332
+Maria jaqueline	5581983230194	https://wa.me/5581983230194
+Felipe Lipe	5581995244916	https://wa.me/5581995244916
+Jessy	5581984392568	https://wa.me/5581984392568
+Rogério Lucas	5581996353668	https://wa.me/5581996353668
+Maria julia	5581998307866	https://wa.me/5581998307866
+Maria Renata	5581998559269	https://wa.me/5581998559269
+Karla Monica Oliveira Neiva	558199949340	https://wa.me/558199949340
+Adilson Araujo	5581984282563	https://wa.me/5581984282563
+João Vitor	5581984241560	https://wa.me/5581984241560
+Romário Henrique Mendonça De Souza	5581997619044	https://wa.me/5581997619044
+Gabriel Gadelha	5581987518539	https://wa.me/5581987518539
+Geovana Pio	5581991886813	https://wa.me/5581991886813
+Marina Tiktok	5581994944316	https://wa.me/5581994944316
+Ju Aum Santos	5581998324651	https://wa.me/5581998324651
+Gabriela Dias	5581986963606	https://wa.me/5581986963606
+Carol Lins	5581991627616	https://wa.me/5581991627616
+André Alcântara	5581996492301	https://wa.me/5581996492301
+Priscila Angélica	5581984528758	https://wa.me/5581984528758
+Aline Ferreira	5581985055868	https://wa.me/5581985055868
+Carol	5581991525119	https://wa.me/5581991525119
+Beatriz Ferreira	5581998873769	https://wa.me/5581998873769
+Katarina Fernandes	5581984874528	https://wa.me/5581984874528
+Monitoramento sema	5581993401836	https://wa.me/5581993401836
+Maria Pry	5581982777246	https://wa.me/5581982777246
+Renata Caroline	5581985179225	https://wa.me/5581985179225
+Isaac correia	5581983858225	https://wa.me/5581983858225
+Cleison Luciano Pereira da Silva	5581992430475	https://wa.me/5581992430475
+Júlia Carneiro	5581985455751	https://wa.me/5581985455751
+Tatiana felix	5581998308323	https://wa.me/5581998308323
+Giovanna Kramer	5581993197693	https://wa.me/5581993197693
+Gabriel Lages	5581987585488	https://wa.me/5581987585488
+Ana Flávia Holanda	5581981248711	https://wa.me/5581981248711
+Karine Soares	5581996070717	https://wa.me/5581996070717
+Talita paloma	5581985442861	https://wa.me/5581985442861
+Rodrigo Silva	5581998682148	https://wa.me/5581998682148
+Taliny	5581981361959	https://wa.me/5581981361959
+Guilherme gomes	5581986452486	https://wa.me/5581986452486
+Ingrid Gusmão	5581988474646	https://wa.me/5581988474646
+Rodrigo henrique	5581998118280	https://wa.me/5581998118280
+Ricardo Menezes	5581992422314	https://wa.me/5581992422314
+Augusto Carpeggiani	5581997012850	https://wa.me/5581997012850
+Patrícia Araújo	5581988009293	https://wa.me/5581988009293
+Crislaine Azevedo	5581984922874	https://wa.me/5581984922874
+Lisley Evelin	5581982137059	https://wa.me/5581982137059
+Jaqueline Rodrigues	5581981869674	https://wa.me/5581981869674
+Simone oliveira	5581983001125	https://wa.me/5581983001125
+Maria Clara Soares	5581982292108	https://wa.me/5581982292108
+Sávio Henrique	5581981558495	https://wa.me/5581981558495
+Victor Melo	5581981625856	https://wa.me/5581981625856
+Gabryela Bastos	5581981790722	https://wa.me/5581981790722
+César Reis	5581981838929	https://wa.me/5581981838929
+Desihree Oara De Souza Martins Cruz	5581981842364	https://wa.me/5581981842364
+Mayara lima	5581981864094	https://wa.me/5581981864094
+Genilyn Gomes	5581981927225	https://wa.me/5581981927225
+Júlia Silva	5581981950302	https://wa.me/5581981950302
+Luan gabriel	5581981953213	https://wa.me/5581981953213
+Júlia Correia	5581982039855	https://wa.me/5581982039855
+João Paulo	5581982084802	https://wa.me/5581982084802
+Adriana reis	5581982157765	https://wa.me/5581982157765
+Andreia Martins	5581982192668	https://wa.me/5581982192668
+Edilson Antônio Da Silva	5581982195338	https://wa.me/5581982195338
+Amanda Carolina	5581982211119	https://wa.me/5581982211119
+Maria Luiza	5581982450531	https://wa.me/5581982450531
+Renata Nogueira	5581982461213	https://wa.me/5581982461213
+Jennifer Medeiros Soares	5581982517604	https://wa.me/5581982517604
+Aline Silva	5581982529754	https://wa.me/5581982529754
+Júlio César	5581982611672	https://wa.me/5581982611672
+Alexsandra Monteiro	5581982672108	https://wa.me/5581982672108
+Daniel Santos	5581982715291	https://wa.me/5581982715291
+Aline Silva	5581982725272	https://wa.me/5581982725272
+Iago Yuri	5581982746975	https://wa.me/5581982746975
+Igor Delmiro	5581982784268	https://wa.me/5581982784268
+Lucas Bernardino	5581982829432	https://wa.me/5581982829432
+Laís	5581982887146	https://wa.me/5581982887146
+Ana Karine	5581982933675	https://wa.me/5581982933675
+Suely nascimento	5581982951461	https://wa.me/5581982951461
+Jullia Gabrielly	5581982964753	https://wa.me/5581982964753
+Samara Leticia	5581983013107	https://wa.me/5581983013107
+Lethink putovisk	5581983017319	https://wa.me/5581983017319
+Adriana Paz	5581983024704	https://wa.me/5581983024704
+Diva Santos	5581983030047	https://wa.me/5581983030047
+Lucas Beltrão	5581983033476	https://wa.me/5581983033476
+Érika Medeiros	5581983040041	https://wa.me/5581983040041
+Natassia Simplicio	5581983053126	https://wa.me/5581983053126
+Lorena Felix	5581983068636	https://wa.me/5581983068636
+Ana Teresa Silva Alves	5581983073384	https://wa.me/5581983073384
+Adriana Taurino	5581983076322	https://wa.me/5581983076322
+Germana Bezerra	5581983095160	https://wa.me/5581983095160
+Allyne Costa	5581983099552	https://wa.me/5581983099552
+Kildare melo	5581983105105	https://wa.me/5581983105105
+Vitória Sales	5581983136270	https://wa.me/5581983136270
+Valéria Regina	5581983140444	https://wa.me/5581983140444
+Ana Cristina Silva Lima	5581983151589	https://wa.me/5581983151589
+Carlos Emmanuel Pedrosa De Melo	5581983166363	https://wa.me/5581983166363
+Júlia Caxias Dos Santos	5581983167520	https://wa.me/5581983167520
+Júlia Rebeka De Arruda Guedes	5581983185210	https://wa.me/5581983185210
+Cibelly Daher	5581983193216	https://wa.me/5581983193216
+Deisy Macielly	5581983195000	https://wa.me/5581983195000
+Francianne Alencar Macedo	5581983195666	https://wa.me/5581983195666
+Maykon Alves	5581983212009	https://wa.me/5581983212009
+Marlon Bertolezo Da Silva	5581983226209	https://wa.me/5581983226209
+Alexsandro Rocha	5581983229501	https://wa.me/5581983229501
+Agatha Lúcia	5581983231645	https://wa.me/5581983231645
+Jackson kleber	5581983233008	https://wa.me/5581983233008
+Joao Vitor	5581983233244	https://wa.me/5581983233244
+Augusto Pelzer	5581983237769	https://wa.me/5581983237769
+Juliana Menezes	5581983239701	https://wa.me/5581983239701
+Ana Patrícia	5581983257592	https://wa.me/5581983257592
+João Wanderley	5581983263543	https://wa.me/5581983263543
+Flavios Luiz	5581983268680	https://wa.me/5581983268680
+Vitória Maria	5581983279389	https://wa.me/5581983279389
+Juliana Oliveira	5581983283964	https://wa.me/5581983283964
+Rodrigo Bernardes	5581983288019	https://wa.me/5581983288019
+Carlos Oliveira	5581983305609	https://wa.me/5581983305609
+Maria José	5581983307723	https://wa.me/5581983307723
+Aline Silva	5581983309932	https://wa.me/5581983309932
+Luiz Fernando	5581983316569	https://wa.me/5581983316569
+Amanda Fonseca	5581983330008	https://wa.me/5581983330008
+Gabryela Bastos	5581983333952	https://wa.me/5581983333952
+Paulino Pereira	5581983343664	https://wa.me/5581983343664
+Jefferson Luan	5581983347995	https://wa.me/5581983347995
+Claudiane Sampaio	5581983350808	https://wa.me/5581983350808
+Jéssica Silva	5581983359038	https://wa.me/5581983359038
+Carolina Festa Infantil	5581983363860	https://wa.me/5581983363860
+Elvira Maria	5581983367925	https://wa.me/5581983367925
+Clarice Mariana	5581983374542	https://wa.me/5581983374542
+Thiago Lins	5581983392851	https://wa.me/5581983392851
+Juliana Rayana	5581983396740	https://wa.me/5581983396740
+Giulia Simas	5581983397291	https://wa.me/5581983397291
+Jaine da Paz	5581983408374	https://wa.me/5581983408374
+Guilherme Lins	5581983414502	https://wa.me/5581983414502
+Paloma Silva	5581983426421	https://wa.me/5581983426421
+Alexsandra Soares	5581983431636	https://wa.me/5581983431636
+Iago Yuri	5581983447276	https://wa.me/5581983447276
+Bruno Cesar	5581983463502	https://wa.me/5581983463502
+Aline Souza	5581983474328	https://wa.me/5581983474328
+Sandra Virgínio	5581983475103	https://wa.me/5581983475103
+Júlio César	5581983484152	https://wa.me/5581983484152
+Diego Bandeira	5581983494447	https://wa.me/5581983494447
+Thalyson kelner	5581983495498	https://wa.me/5581983495498
+Kleber cristiano	5581983505737	https://wa.me/5581983505737
+Mariana Oliveira	5581983517413	https://wa.me/5581983517413
+Telma feitosa	5581983523227	https://wa.me/5581983523227
+Gabriel Garcia	5581983536075	https://wa.me/5581983536075
+Cristhyane oliveira	5581983540939	https://wa.me/5581983540939
+Érica Rafaela	5581983549939	https://wa.me/5581983549939
+Kerolleen Dutra Leal	5581983550769	https://wa.me/5581983550769
+Klinsmann	5581983554114	https://wa.me/5581983554114
+Gabriela Felix	5581983557341	https://wa.me/5581983557341
+Francimily salgado	5581983561362	https://wa.me/5581983561362
+Maria Clara	5581983564749	https://wa.me/5581983564749
+Maria José	5581983572520	https://wa.me/5581983572520
+João Paulo	5581983578441	https://wa.me/5581983578441
+Klinsmann	5581983583135	https://wa.me/5581983583135
+João Paulo	5581983586648	https://wa.me/5581983586648
+José Rúben cysneiro	5581983595757	https://wa.me/5581983595757
+Rejane Vergara	5581983598040	https://wa.me/5581983598040
+Matheus Silva	5581983600621	https://wa.me/5581983600621
+Júnior Barbosa	5581983605710	https://wa.me/5581983605710
+Elidiane Silva	5581983612299	https://wa.me/5581983612299
+Elidiane Silva	5581983618239	https://wa.me/5581983618239
+Isaque Vieira	5581983630560	https://wa.me/5581983630560
+André Luiz	5581983639963	https://wa.me/5581983639963
+Roberto Junior	5581983646540	https://wa.me/5581983646540
+Érika Taciana Ramos	5581983648317	https://wa.me/5581983648317
+Samara Guimarães	5581983664700	https://wa.me/5581983664700
+Fabiana Rodrigues	5581983667488	https://wa.me/5581983667488
+Lais Lopes	5581983676048	https://wa.me/5581983676048
+Alexandre Silva	5581983679778	https://wa.me/5581983679778
+Ricardo Manholetti	5581983688123	https://wa.me/5581983688123
+Daiane Cristina	5581983689241	https://wa.me/5581983689241
+Brenda Souza	5581983692365	https://wa.me/5581983692365
+Danielle Lira	5581983693849	https://wa.me/5581983693849
+Fellipe Thomas	5581983695278	https://wa.me/5581983695278
+Giselly paula	5581983701111	https://wa.me/5581983701111
+Isabela caroline	5581983712314	https://wa.me/5581983712314
+Fabrício Dornelas	5581983715847	https://wa.me/5581983715847
+Gabriel Marinho	5581983726810	https://wa.me/5581983726810
+Naldyson Aragão	5581983737571	https://wa.me/5581983737571
+Sandy Lins	5581983738068	https://wa.me/5581983738068
+Lucas Bernardino	5581983741804	https://wa.me/5581983741804
+Clebinho montagem	5581983742955	https://wa.me/5581983742955
+Joao Lucas Monteiro	5581983745383	https://wa.me/5581983745383
+Dj Soneca	5581983747166	https://wa.me/5581983747166
+Julianne Matoso	5581983760466	https://wa.me/5581983760466
+Werica Lira	5581983762950	https://wa.me/5581983762950
+Rodrigo Barros	5581983773149	https://wa.me/5581983773149
+Jaqueline Santos	5581983776672	https://wa.me/5581983776672
+Rafael dos Santos	5581983780152	https://wa.me/5581983780152
+Rafael Wesley	5581983780806	https://wa.me/5581983780806
+Priscila Lopes	5581983781279	https://wa.me/5581983781279
+Rodrigo Moral	5581983788682	https://wa.me/5581983788682
+Cíntia Cristina	5581983789379	https://wa.me/5581983789379
+Robson Malaquias	5581983791148	https://wa.me/5581983791148
+Iasmim Rodrigues	5581983795465	https://wa.me/5581983795465
+Gessica Coutinho	5581983795655	https://wa.me/5581983795655
+Lucas Lira	5581983802312	https://wa.me/5581983802312
+Adrya Lavinia	5581983802845	https://wa.me/5581983802845
+Sandro Lima	5581983808364	https://wa.me/5581983808364
+Samara Tavares	5581983813035	https://wa.me/5581983813035
+Joana Darc	5581983822999	https://wa.me/5581983822999
+Alexandre Paiva	5581983830536	https://wa.me/5581983830536
+Sílvia Andréia	5581983837150	https://wa.me/5581983837150
+Aldo Barros	5581983838427	https://wa.me/5581983838427
+Roberto Oliveira	5581983840313	https://wa.me/5581983840313
+Gabriela M. Oliveira	5581983847141	https://wa.me/5581983847141
+Thaysa Farias	5581983849379	https://wa.me/5581983849379
+Andresa Maria	5581983849534	https://wa.me/5581983849534
+Jheymesson Amorim	5581983859827	https://wa.me/5581983859827
+Francisco Sales	5581983866772	https://wa.me/5581983866772
+Alysson Rocha	5581983871722	https://wa.me/5581983871722
+Danielle Oliveira	5581983872555	https://wa.me/5581983872555
+Jadielle ribeiro	5581983873859	https://wa.me/5581983873859
+Gicellie Vitória	5581983880774	https://wa.me/5581983880774
+Nayara Elen	5581983886087	https://wa.me/5581983886087
+Wana Cristina	5581983886759	https://wa.me/5581983886759
+Rodrigo Cesario	5581983888615	https://wa.me/5581983888615
+Amanda Lopes	5581983889335	https://wa.me/5581983889335
+Tainan Paiva	5581983891390	https://wa.me/5581983891390
+Dyogenis Silva	5581983893601	https://wa.me/5581983893601
+Belchior bar	5581983895540	https://wa.me/5581983895540
+Ana Leticia	5581983904067	https://wa.me/5581983904067
+Anderson Silva	5581983905009	https://wa.me/5581983905009
+Carlos Eduardo	5581983905145	https://wa.me/5581983905145
+Marcelo Vinicius	5581983917467	https://wa.me/5581983917467
+Eliege	5581983923080	https://wa.me/5581983923080
+Lais marques	5581983926992	https://wa.me/5581983926992
+Flavio Oliveira	5581983933755	https://wa.me/5581983933755
+Nicolas Xavier	5581983951494	https://wa.me/5581983951494
+Rogerio ferreira	5581983956366	https://wa.me/5581983956366
+Izael Costa	5581983958656	https://wa.me/5581983958656
+Marcelo José Santos	5581983961054	https://wa.me/5581983961054
+Dilce Ferreira	5581983964749	https://wa.me/5581983964749
+Douglas Barbosa	5581983965746	https://wa.me/5581983965746
+Maria Madalena	5581983966568	https://wa.me/5581983966568
+Iago	5581983967815	https://wa.me/5581983967815
+Marcílio Viegas	5581983980502	https://wa.me/5581983980502
+Eduardo Rocha	5581983984883	https://wa.me/5581983984883
+Rayssa Cristina	5581983988162	https://wa.me/5581983988162
+Selma Santos	5581984006529	https://wa.me/5581984006529
+Reginaldo Rodrigues	5581984011169	https://wa.me/5581984011169
+Jurandir Juvino	5581984015286	https://wa.me/5581984015286
+Isis Lorena	5581984019783	https://wa.me/5581984019783
+Talisson	5581984023468	https://wa.me/5581984023468
+Ericson Duarte	5581984025934	https://wa.me/5581984025934
+Luiza Barbosa	5581984031295	https://wa.me/5581984031295
+Afonso Henrique	5581984035046	https://wa.me/5581984035046
+Suyanne ribeiro	5581984040060	https://wa.me/5581984040060
+Jailson Guedes	5581984046595	https://wa.me/5581984046595
+Ayla Carine	5581984047297	https://wa.me/5581984047297
+henryck	5581981007689	https://wa.me/5581981007689
+davi	5581985931331	https://wa.me/5581985931331
+kalyne helena	5581984349536	https://wa.me/5581984349536
+etiene marinho	5581984386140	https://wa.me/5581984386140
+marthyra telf	5581986631350	https://wa.me/5581986631350
+paloma rodrigues	5582988640959	https://wa.me/5582988640959
+gilmara de assis	5581988851707	https://wa.me/5581988851707
+simone karla	5581982323205	https://wa.me/5581982323205
+pedro maciel	5581986178202	https://wa.me/5581986178202
+victor	5581996226701	https://wa.me/5581996226701
+isabela	5581986151596	https://wa.me/5581986151596
+samara cavalcante	5581991174058	https://wa.me/5581991174058
+angelica fidelix	5581973411487	https://wa.me/5581973411487
+mirella carvalho	5581987274370	https://wa.me/5581987274370
+maysa juanny de souza xavier	5581994498044	https://wa.me/5581994498044
+nivaldir santos	5581988409073	https://wa.me/5581988409073
+tiago santos	5581983243172	https://wa.me/5581983243172
+bárbara costa	5581984500398	https://wa.me/5581984500398
+wellington	5581993206292	https://wa.me/5581993206292
+wesley guilherme	5581989138998	https://wa.me/5581989138998
+carla costa	5581984142870	https://wa.me/5581984142870
+luanna cecília	5581984836622	https://wa.me/5581984836622
+vinícius alheiro	5581988296691	https://wa.me/5581988296691
+jose wellington	5581987632668	https://wa.me/5581987632668
+cassio samora	5581985058743	https://wa.me/5581985058743
+julia gabrielly	5581986674853	https://wa.me/5581986674853
+natacha cavalcanti	5581992755062	https://wa.me/5581992755062
+viviane ratis	5581991435500	https://wa.me/5581991435500
+jonathan felipe	5581989529467	https://wa.me/5581989529467
+felipe andrade	5581993402175	https://wa.me/5581993402175
+kayk wollacy	5581989351763	https://wa.me/5581989351763
+vinicio gabriel	5581992407545	https://wa.me/5581992407545
+leandro lima	5581984211011	https://wa.me/5581984211011
+Rita Grazily	5581994252177	https://wa.me/5581994252177
+eduardo francisco	5581991631939	https://wa.me/5581991631939
+estephane viana	5581996238576	https://wa.me/5581996238576
+millena martins	5581995129178	https://wa.me/5581995129178
+Luciana Gomes	5534984062669	https://wa.me/5534984062669
+Larissa thauwanda	5581992929434	https://wa.me/5581992929434
+Isadora Paolla	5581998987814	https://wa.me/5581998987814
+mayara galvao	5581995317736	https://wa.me/5581995317736
+paula barros	5581983281255	https://wa.me/5581983281255
+lidiane oliveira	5581992760561	https://wa.me/5581992760561
+Rebeca Andrade	5581973447388	https://wa.me/5581973447388
+Paloma Carneiro	5581987640090	https://wa.me/5581987640090
+antonio severino	5581986212359	https://wa.me/5581986212359
+Sabrina Sousa	5581991700898	https://wa.me/5581991700898
+Muel	5581996313850	https://wa.me/5581996313850
+maíra santos	5581989089841	https://wa.me/5581989089841
+Susana Rodrigues	5581992035136	https://wa.me/5581992035136
+Cleidinha Santos	5581998100099	https://wa.me/5581998100099
+Daniela Moura	5581979162068	https://wa.me/5581979162068
+vinícius barbosa	5581991746111	https://wa.me/5581991746111
+hiago davi	5581992197789	https://wa.me/5581992197789
+renata cristina	5581997308924	https://wa.me/5581997308924
+beatriz campos	5581992416792	https://wa.me/5581992416792
+kauanny xavier	5581984435400	https://wa.me/5581984435400
+Maria Cecília Silva	5581996121993	https://wa.me/5581996121993
+Jaime Rodrigues	5581987927248	https://wa.me/5581987927248
+cristiano ronaldo	5581988499287	https://wa.me/5581988499287
+drielly correia	5581981787828	https://wa.me/5581981787828
+nascimento	5581981967558	https://wa.me/5581981967558
+sayara guedes	5581998069244	https://wa.me/5581998069244
+debora lima	5581985015515	https://wa.me/5581985015515
+antonio borges	5581984785620	https://wa.me/5581984785620
+Esdras	5581984244890	https://wa.me/5581984244890
+torres	5581984064572	https://wa.me/5581984064572
+fhilipe Ricardo	5581998152327	https://wa.me/5581998152327
+lucas roberto	5581995985218	https://wa.me/5581995985218
+milena rayane	5581991733498	https://wa.me/5581991733498
+pedro henrique	5581987349128	https://wa.me/5581987349128
+mariano junior	5581997899454	https://wa.me/5581997899454
+Edjaclia Luiza Santos	5581992725540	https://wa.me/5581992725540
+Sergio Lima	5581988300435	https://wa.me/5581988300435
+Claudia Pontes Pontes	5551990159768	https://wa.me/5551990159768
+Aym	5581997721010	https://wa.me/5581997721010
+Iuri Peixoto	5581991732819	https://wa.me/5581991732819
+Layane Lalinha	5581997066360	https://wa.me/5581997066360
+Maria Eduarda	5581994389154	https://wa.me/5581994389154
+Flavia Vaz	5581997751057	https://wa.me/5581997751057
+Livia Gonalves	5581985399086	https://wa.me/5581985399086
+Thayza Dias	5581995467269	https://wa.me/5581995467269
+Rosalena Maria	5581985064967	https://wa.me/5581985064967
+Larissa Barros	5581979026575	https://wa.me/5581979026575
+Anderson Aderilton	5581999198062	https://wa.me/5581999198062
+Aguina Santos	5581997431801	https://wa.me/5581997431801
+Ingrid Gusmo	5581988681008	https://wa.me/5581988681008
+Matheus William	5581984899264	https://wa.me/5581984899264
+Rita Fagundes	5581988170202	https://wa.me/5581988170202
+Miguel	5581999138881	https://wa.me/5581999138881
+Leandra Cristina	5581986915251	https://wa.me/5581986915251
+Bruno Cesar	5581989029968	https://wa.me/5581989029968
+Caroline Nunes Dantas	5581984080102	https://wa.me/5581984080102
+Ericka Salles	5581991427348	https://wa.me/5581991427348
+Lidiana Holanda	5581984268640	https://wa.me/5581984268640
+Yasmim Souza De Amorim Gonalves	5581994281949	https://wa.me/5581994281949
+Jaqueline Saraiva	5581998021372	https://wa.me/5581998021372
+Larissa St	5581986900812	https://wa.me/5581986900812
+Keylane Menezes	5581984149331	https://wa.me/5581984149331
+Nathaly Fernanda Lucena Santos	5581993465879	https://wa.me/5581993465879
+Willyan Gabriel	5581998387170	https://wa.me/5581998387170
+Iris Dellory	5581994357946	https://wa.me/5581994357946
+Hianne Melo	5581991417115	https://wa.me/5581991417115
+Brunna Felix	5581987935245	https://wa.me/5581987935245
+Netinho Do Grau	5581993281427	https://wa.me/5581993281427
+Thallita Cavalcanti	5581987498323	https://wa.me/5581987498323
+Andra Andrade Santos Santos	5581991915560	https://wa.me/5581991915560
+Eloisa Aciole	5581991627671	https://wa.me/5581991627671
+Gustavo Da Silva Santos	5581999833014	https://wa.me/5581999833014
+Rayane Santos	5581983599685	https://wa.me/5581983599685
+Victor Gabriel	5581996992616	https://wa.me/5581996992616
+Rinaldo Victor	5581981360847	https://wa.me/5581981360847
+Arthur Castro	5581996047096	https://wa.me/5581996047096
+Gabriella Reis	5581981767657	https://wa.me/5581981767657
+Lucas Gabriel	5581987899871	https://wa.me/5581987899871
+Maria Doralice Seabra De	5581997812146	https://wa.me/5581997812146
+Mlly Slv	5581987826571	https://wa.me/5581987826571
+Stephany Medeiros	5581988924152	https://wa.me/5581988924152
+Patrcia Rogria	5581997499554	https://wa.me/5581997499554
+Tatiana Do Monte	5581999530060	https://wa.me/5581999530060
+Emmanoel	5581998755400	https://wa.me/5581998755400
+Fabricio Farias	5581984783320	https://wa.me/5581984783320
+Thays Oliveira	5581999856973	https://wa.me/5581999856973
+Beatriz Ester	5581996072104	https://wa.me/5581996072104
+Terenice Gonalves	5581988260743	https://wa.me/5581988260743
+Norma Malena	5581984378983	https://wa.me/5581984378983
+Armando Macrio	5581999204244	https://wa.me/5581999204244
+Julia Almeida	5587999018890	https://wa.me/5587999018890
+Leonardo Lins Arago	5581986992306	https://wa.me/5581986992306
+Ana Ftima Abreu Ramos De Souza	5581988838234	https://wa.me/5581988838234
+Aline Correia Nibbering De Arajo	5581997041706	https://wa.me/5581997041706
+Thamy Araujo	5581992569290	https://wa.me/5581992569290
+Gabriela Alheiros	5581989552299	https://wa.me/5581989552299
+Juliana Lio	5581993831272	https://wa.me/5581993831272
+Louise Marinho Neres	5581987337725	https://wa.me/5581987337725
+Diego	5581994478609	https://wa.me/5581994478609
+Breno Alexandre Da Silva Dias	5581998550296	https://wa.me/5581998550296
+Silas Ataide	5581983423588	https://wa.me/5581983423588
+Thiago Pereira	5581991355350	https://wa.me/5581991355350
+Gerllane	5587988514648	https://wa.me/5587988514648
+Aline Patrcia	5581988871641	https://wa.me/5581988871641
+Rita De Cassia Carneiro Da Silva	5583988686684	https://wa.me/5583988686684
+Marcelino Almeida	5581995362268	https://wa.me/5581995362268
+Eliseu Queiroz	5581986143915	https://wa.me/5581986143915
+Vitria Xavier	5581997647392	https://wa.me/5581997647392
+Joyce	5581989340360	https://wa.me/5581989340360
+Douglas Almeida	5581984119212	https://wa.me/5581984119212
+Gerllane s	5581988514648	https://wa.me/5581988514648
+Emerson Carlos 81	5581984753603	https://wa.me/5581984753603
+Antonio Jos Felipe Lopes De Arajo	5581999784102	https://wa.me/5581999784102
+Aline Vitoria	5581997068090	https://wa.me/5581997068090
+Leticia Victoria	5511965462510	https://wa.me/5511965462510
+Joao Vitor	5581985979591	https://wa.me/5581985979591
+Rosa Ferreira	5581985577435	https://wa.me/5581985577435
+Aylla Campos	5581984396056	https://wa.me/5581984396056
+Alison Brito De Barros	5581997814404	https://wa.me/5581997814404
+Wemerson Alves Da Silva	5581991082209	https://wa.me/5581991082209
+Andrew Artur	5581986300058	https://wa.me/5581986300058
+Julianny Santos	5581996299799	https://wa.me/5581996299799
+Ailton Fernandes	5581973140957	https://wa.me/5581973140957
+Samuel Albuquerque	5581996578370	https://wa.me/5581996578370
+Gatha Sfia	5581983539202	https://wa.me/5581983539202
+Eduarda Queiroz	5581998030800	https://wa.me/5581998030800
+Miryam Carvalho	5581997323325	https://wa.me/5581997323325
+Pedro Melo	5581981429535	https://wa.me/5581981429535
+Renato Andrade	5581994160012	https://wa.me/5581994160012
+Renan Jos	5581974015615	https://wa.me/5581974015615
+Ananda Melo 	5581984791553	https://wa.me/5581984791553
+Raquel Linda	5581993828262	https://wa.me/5581993828262
+Sergio Roberto	5581985357068	https://wa.me/5581985357068
+Leandro Barbosa	5581989759510	https://wa.me/5581989759510
+Marcela Fbia	5581994848843	https://wa.me/5581994848843
+Anderson Passos Da Silva	5581985663559	https://wa.me/5581985663559
+Gabriel Lins De Souza Barbosa	5581993024084	https://wa.me/5581993024084
+Maria Eloiza Bernardo Ferreira	5581996003889	https://wa.me/5581996003889
+Tvine Souza	5581988322718	https://wa.me/5581988322718
+Geraldo Gomes	5581986497223	https://wa.me/5581986497223
+Damiana Maria Da Silva Brito	5581992819434	https://wa.me/5581992819434
+Josiane Gonalves	5581997723556	https://wa.me/5581997723556
+Josu Dias	5581996966961	https://wa.me/5581996966961
+Sheyla Maria	5581987228134	https://wa.me/5581987228134
+Luana Barretto	5581994999482	https://wa.me/5581994999482
+Rosany Regina	5581986183641	https://wa.me/5581986183641
+Andrea Beltro	5581985226099	https://wa.me/5581985226099
+Viviany Da Silva Miranda	5581995222133	https://wa.me/5581995222133
+Simone Silva	5581991706161	https://wa.me/5581991706161
+Maria Carolina	5581984740160	https://wa.me/5581984740160
+Matheus Almeida	5581985779683	https://wa.me/5581985779683
+Beltemires Sampaio De Cas	5581999408382	https://wa.me/5581999408382
+Sebastio Lucena	5581986560166	https://wa.me/5581986560166
+Daniela Santos Nazario De Oliveira Oliveira	5581988611048	https://wa.me/5581988611048
+Maria Letcia Lima	5581992431152	https://wa.me/5581992431152
+Ivan Andrade	5581997581069	https://wa.me/5581997581069
+Marlia Meira	5581983079353	https://wa.me/5581983079353
+Ivanilson Lira	5581985183744	https://wa.me/5581985183744
+Fatima Twin	5581994637178	https://wa.me/5581994637178
+Roseane Brito	5581991478745	https://wa.me/5581991478745
+Gabriel Domingues	5535999442276	https://wa.me/5535999442276
+Pollyana	5581996275211	https://wa.me/5581996275211
+Mj Andrade Gomes	5581988638893	https://wa.me/5581988638893
+Luiza Vitoria	5581973077711	https://wa.me/5581973077711
+Luan Spotify	5581999427388	https://wa.me/5581999427388
+Luciana Gomes Fontes	5581985703931	https://wa.me/5581985703931
+Lucia Ferreira	5581991394234	https://wa.me/5581991394234
+Diniz Jair Jair	5581997201961	https://wa.me/5581997201961
+Maria Letcia Martiniano	5581997844651	https://wa.me/5581997844651
+Lucas Vinicius	5581984183829	https://wa.me/5581984183829
+Luiz Felipe	5581987607771	https://wa.me/5581987607771
+Luciana Gomes Fontes	5581999027521	https://wa.me/5581999027521
+Vivian Elania	5581988795982	https://wa.me/5581988795982
+Bruna Cirne	5581995109858	https://wa.me/5581995109858
+Daniel Bandeira Bandeira	5581984680443	https://wa.me/5581984680443
+Ana Karolyne Guimares	5581986977279	https://wa.me/5581986977279
+Lvia Lins	5581992118742	https://wa.me/5581992118742
+Helene Arruda	5581988301903	https://wa.me/5581988301903
+Maria Clara Batista	5581996271214	https://wa.me/5581996271214
+Haryany Maria	5581979042389	https://wa.me/5581979042389
+Fabio Pereira	5581999999348	https://wa.me/5581999999348
+Mirele Alves	5581996457707	https://wa.me/5581996457707
+Jean Mota	5581989553236	https://wa.me/5581989553236
+Jean Mota	5581991794634	https://wa.me/5581991794634
+Isabella Barbosa	5581987707204	https://wa.me/5581987707204
+Rebeca Gama	5581986440748	https://wa.me/5581986440748
+Paloma Gomes	5581996548868	https://wa.me/5581996548868
+Thallytaa Karla	5581985669807	https://wa.me/5581985669807
+Rafaela Nascimento	5581997635393	https://wa.me/5581997635393
+Dhbora Cristhina	5581999922649	https://wa.me/5581999922649
+Claudia	5581983799493	https://wa.me/5581983799493
+Ravir Vasconcelos	5581983653883	https://wa.me/5581983653883
+Matheus Ruan	5581988202016	https://wa.me/5581988202016
+Wanessa Cabral	5581996436612	https://wa.me/5581996436612
+Anderson Gomos Da Silva	5581996619973	https://wa.me/5581996619973
+Jersica Spinelli	5581994397777	https://wa.me/5581994397777
+Matheus Lobo	5581985731052	https://wa.me/5581985731052
+Evandro De Santana Fragoso Fragoso	5581984793940	https://wa.me/5581984793940
+Amanda Karla	5581994476016	https://wa.me/5581994476016
+Cadu Miranda	5581991596661	https://wa.me/5581991596661
+Willy Torres	5581992330711	https://wa.me/5581992330711
+Joao Victor	5581999945658	https://wa.me/5581999945658
+Rodolfo Rodrigo	5581999407982	https://wa.me/5581999407982
+Warley Alves	5581996469124	https://wa.me/5581996469124
+Spinelli Rc	5581994390007	https://wa.me/5581994390007
+Ewerton Diego	5581992374232	https://wa.me/5581992374232
+Kauanne Ketilem	5581989715328	https://wa.me/5581989715328
+Jennyfer Karla	5581992730295	https://wa.me/5581992730295
+Flavio Luis	5581997384336	https://wa.me/5581997384336
+Julia Gabriela	5581982191769	https://wa.me/5581982191769
+Luciana Ponce	5581985831314	https://wa.me/5581985831314
+Pedro Gama	5581995471606	https://wa.me/5581995471606
+Laura Lima	5581992175811	https://wa.me/5581992175811
+Wendel Coutinho	5581992367619	https://wa.me/5581992367619
+Isabella Vitoria	5581992904443	https://wa.me/5581992904443
+Derly Silva	5581996142397	https://wa.me/5581996142397
+Rafaela Borba	5581983342348	https://wa.me/5581983342348
+Vando Vicente	5581986227755	https://wa.me/5581986227755
+Maria Luiza Viegas	5581993260876	https://wa.me/5581993260876
+Alexandre Manoel	5581987300174	https://wa.me/5581987300174
+Lanyh Costa	5581989155803	https://wa.me/5581989155803
+Joo Cardoso	5581983656726	https://wa.me/5581983656726
+Lucas Heimer	5581999916443	https://wa.me/5581999916443
+Sadrak	5581988355413	https://wa.me/5581988355413
+Adriana Diana	5581987750390	https://wa.me/5581987750390
+Maria Luiza Albuquerque	5581971202802	https://wa.me/5581971202802
+Viviane Fernandes Miranda De Oliveira	5581994458976	https://wa.me/5581994458976
+Gel Vilarim	5581986092135	https://wa.me/5581986092135
+Ilse Nellie	5581998037480	https://wa.me/5581998037480
+Rodrigo De Souza	5581983810545	https://wa.me/5581983810545
+Antonelly Paolla	5581984487108	https://wa.me/5581984487108
+Analice Paranhos	5581996657077	https://wa.me/5581996657077
+Rute Gabrielly	5581987912682	https://wa.me/5581987912682
+Emanuel Nunes	5588994012269	https://wa.me/5588994012269
+Monique Mayara	5581984052745	https://wa.me/5581984052745
+Eduarda Barbosa	5581986406239	https://wa.me/5581986406239
+Thaisa Merick	5581993102671	https://wa.me/5581993102671
+Brenda Lima	5581987826205	https://wa.me/5581987826205
+Dara Luiza	5581999349951	https://wa.me/5581999349951
+Sydnei Simio	5581999264473	https://wa.me/5581999264473
+Neuza Ferrari	5581997657200	https://wa.me/5581997657200
+Janaina Souza	5581994924524	https://wa.me/5581994924524
+Sergio Filho	5581993933446	https://wa.me/5581993933446
+Carlos Do Vale	5581983450476	https://wa.me/5581983450476
+Netto Alves	5581981464158	https://wa.me/5581981464158
+Yara Outtes	5581987184922	https://wa.me/5581987184922
+Osnar Soares	5581993580663	https://wa.me/5581993580663
+Maria Eduarda	5538659355887	https://wa.me/5538659355887
+Caroline	5581998081430	https://wa.me/5581998081430
+Alice Souza	5581998169968	https://wa.me/5581998169968
+Erik Menezes	5581985084008	https://wa.me/5581985084008
+Fabio Araujo	5581971092803	https://wa.me/5581971092803
+Hugo Paixao	5581995451827	https://wa.me/5581995451827
+Ariadnne Karolayne	5581983664512	https://wa.me/5581983664512
+Gabriel Vincius	5581996399858	https://wa.me/5581996399858
+Thiago Alberto	5581997224176	https://wa.me/5581997224176
+Douglas Lima	5581988172999	https://wa.me/5581988172999
+Natalia Moura	5581995585090	https://wa.me/5581995585090
+Viviane Fernandes Miranda De Oliveira	5581994458976	https://wa.me/5581994458976
+Sebastio Nunes Queiroz	5584987352170	https://wa.me/5584987352170
+Emanuel Nunes	5588994012269	https://wa.me/5588994012269
+Eduardo Fernandes	5581986980226	https://wa.me/5588994012269
+Hadassa Rebecca	5581984295149	https://wa.me/5581984295149
+Maria Clara	5581987712348	https://wa.me/5581987712348`;
 
-        // Elementos DOM
-        const searchInput = document.getElementById('searchInput');
-        const searchButton = document.getElementById('searchButton');
-        const loading = document.getElementById('loading');
-        const resultsDiv = document.getElementById('results');
-        const resultsList = document.getElementById('resultsList');
-        const errorMessageDiv = document.getElementById('errorMessage');
-        const statsBox = document.getElementById('statsBox');
-        const totalCountSpan = document.getElementById('totalCount');
-        const exampleList = document.getElementById('exampleList');
-
-        // Atualizar contador
-        totalCountSpan.textContent = clientes.length;
-        statsBox.innerHTML = `📊 Base de dados carregada: ${clientes.length} clientes`;
-
-        // Criar exemplos (primeiros 10 nomes)
-        const exemplos = clientes.slice(0, 10).map(c => c.nome.split(' ')[0]);
-        const exemplosUnicos = [...new Set(exemplos)];
-        exemplosUnicos.slice(0, 8).forEach(nome => {
-            const span = document.createElement('span');
-            span.className = 'example-item';
-            span.textContent = nome;
-            span.onclick = () => {
-                searchInput.value = nome;
-                buscarCliente(nome);
-            };
-            exampleList.appendChild(span);
-        });
-
-        // ==================== FUNÇÕES ====================
-        
-        function normalizarTexto(texto) {
-            if (!texto) return '';
-            
-            const mapa = {
-                'á': 'a', 'à': 'a', 'ã': 'a', 'â': 'a', 'ä': 'a',
-                'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e',
-                'í': 'i', 'ì': 'i', 'î': 'i', 'ï': 'i',
-                'ó': 'o', 'ò': 'o', 'õ': 'o', 'ô': 'o', 'ö': 'o',
-                'ú': 'u', 'ù': 'u', 'û': 'u', 'ü': 'u',
-                'ç': 'c', 'ñ': 'n'
-            };
-            
-            let normalizado = texto.toLowerCase().trim();
-            for (let acento in mapa) {
-                normalizado = normalizado.replace(new RegExp(acento, 'g'), mapa[acento]);
+    // --------------------------------------------------------------
+    // 2. Parse do TSV (tab separated) ignorando cabeçalho
+    // --------------------------------------------------------------
+    function parseContacts(raw) {
+        const lines = raw.split(/\r?\n/);
+        const contacts = [];
+        let firstLine = true;
+        for (let line of lines) {
+            if (!line.trim()) continue;
+            if (firstLine) {
+                firstLine = false;
+                continue;  // pula cabeçalho
             }
-            return normalizado.replace(/[^a-z\s]/g, '');
-        }
-        
-        function similaridade(str1, str2) {
-            const a = normalizarTexto(str1);
-            const b = normalizarTexto(str2);
-            
-            if (a === b) return 100;
-            if (a.length === 0 || b.length === 0) return 0;
-            
-            const matriz = [];
-            for (let i = 0; i <= a.length; i++) matriz[i] = [i];
-            for (let j = 0; j <= b.length; j++) matriz[0][j] = j;
-            
-            for (let i = 1; i <= a.length; i++) {
-                for (let j = 1; j <= b.length; j++) {
-                    const custo = a[i-1] === b[j-1] ? 0 : 1;
-                    matriz[i][j] = Math.min(
-                        matriz[i-1][j] + 1,
-                        matriz[i][j-1] + 1,
-                        matriz[i-1][j-1] + custo
-                    );
+            const parts = line.split('\t');
+            if (parts.length >= 3) {
+                let nome = parts[0].trim();
+                let telefone = parts[1].trim();
+                let linkWhats = parts[2].trim();
+                if (nome && telefone && linkWhats) {
+                    contacts.push({ nome, telefone, linkWhats });
                 }
             }
-            
-            const distancia = matriz[a.length][b.length];
-            const maxLen = Math.max(a.length, b.length);
-            return Math.round(((maxLen - distancia) / maxLen) * 100);
         }
-        
-        function showError(msg) {
-            errorMessageDiv.textContent = msg;
-            errorMessageDiv.style.display = 'block';
-            setTimeout(() => {
-                errorMessageDiv.style.display = 'none';
-            }, 5000);
-        }
-        
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        
-        function buscarClientes(nomeBusca) {
-            if (!clientes.length) return [];
-            
-            const resultados = [];
-            for (let cliente of clientes) {
-                const sim = similaridade(nomeBusca, cliente.nome);
-                if (sim >= 80) {
-                    resultados.push({
-                        nome: cliente.nome,
-                        telefone: cliente.telefone,
-                        similaridade: sim
-                    });
-                }
+        return contacts;
+    }
+
+    const contactList = parseContacts(rawData);
+    // Atualizar contador total
+    document.getElementById('totalCount').innerText = contactList.length;
+
+    // --------------------------------------------------------------
+    // 3. Utilitários de normalização e similaridade
+    // --------------------------------------------------------------
+    function normalizeName(str) {
+        // Remove acentos, pontuação, números, espaços extras e deixa minúsculo
+        return str
+            .toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
+            .replace(/[^a-záéíóúãõç\s]/g, '')      // mantém letras e espaços
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    // Similaridade baseada em distância de Levenshtein (percentual)
+    function levenshteinSimilarity(a, b) {
+        if (a === b) return 100;
+        if (a.length === 0 || b.length === 0) return 0;
+        const matrix = Array(a.length + 1).fill().map(() => Array(b.length + 1).fill(0));
+        for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
+        for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
+        for (let i = 1; i <= a.length; i++) {
+            for (let j = 1; j <= b.length; j++) {
+                const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                matrix[i][j] = Math.min(
+                    matrix[i - 1][j] + 1,
+                    matrix[i][j - 1] + 1,
+                    matrix[i - 1][j - 1] + cost
+                );
             }
-            resultados.sort((a, b) => b.similaridade - a.similaridade);
-            return resultados.slice(0, 5);
+        }
+        const distance = matrix[a.length][b.length];
+        const maxLen = Math.max(a.length, b.length);
+        return Math.round(((maxLen - distance) / maxLen) * 100);
+    }
+
+    // Comparação principal (exata ou similar)
+    function findSimilarContacts(searchTerm, minSimilarity) {
+        if (!searchTerm.trim()) return [];
+        const normalizedSearch = normalizeName(searchTerm);
+        if (normalizedSearch === "") return [];
+        
+        const results = [];
+        for (const contact of contactList) {
+            const normalizedContact = normalizeName(contact.nome);
+            let similarity = levenshteinSimilarity(normalizedSearch, normalizedContact);
+            // garantia de exatidão (se for igual exato 100%)
+            if (normalizedSearch === normalizedContact) similarity = 100;
+            
+            if (similarity >= minSimilarity) {
+                results.push({
+                    nome: contact.nome,
+                    telefone: contact.telefone,
+                    link: contact.linkWhats,
+                    similaridade: similarity
+                });
+            }
+        }
+        // ordena por maior similaridade
+        results.sort((a,b) => b.similaridade - a.similaridade);
+        return results;
+    }
+
+    // --------------------------------------------------------------
+    // 4. Renderização dos cards na tela
+    // --------------------------------------------------------------
+    const searchInput = document.getElementById('searchInput');
+    const similaritySlider = document.getElementById('similaritySlider');
+    const simValueSpan = document.getElementById('simValue');
+    const searchBtn = document.getElementById('searchBtn');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const resultStatsSpan = document.getElementById('resultStats');
+
+    // Atualiza label do slider
+    similaritySlider.addEventListener('input', (e) => {
+        simValueSpan.innerText = e.target.value + '%';
+    });
+
+    function performSearch() {
+        const query = searchInput.value.trim();
+        const minSim = parseInt(similaritySlider.value, 10);
+        
+        if (query === "") {
+            resultsContainer.innerHTML = `<div class="empty-state">🔎 Digite um nome e clique em "Buscar agora" para iniciar a consulta.</div>`;
+            resultStatsSpan.innerHTML = `🔎 Aguardando busca`;
+            return;
         }
         
-        function displayResults(resultados, nomeBusca) {
-            resultsList.innerHTML = '';
-            
-            if (resultados.length === 0) {
-                resultsList.innerHTML = `<div class="no-results">❌ Nenhum cliente encontrado com similaridade ≥ 80% para "${escapeHtml(nomeBusca)}"</div>`;
-                resultsDiv.style.display = 'block';
-                return;
-            }
-            
-            resultados.forEach(result => {
-                const similarityClass = result.similaridade >= 90 ? 'similarity-high' : 'similarity-medium';
-                const card = document.createElement('div');
-                card.className = 'result-card';
-                card.innerHTML = `
-                    <div class="result-name">👤 ${escapeHtml(result.nome)}</div>
-                    <div class="result-phone">📞 ${escapeHtml(result.telefone)}</div>
-                    <div class="result-similarity ${similarityClass}">🎯 Similaridade: ${result.similaridade}%</div>
-                    <a href="${result.telefone}" target="_blank" class="whatsapp-button">
-                        💬 Conversar no WhatsApp
+        const results = findSimilarContacts(query, minSim);
+        
+        if (results.length === 0) {
+            resultsContainer.innerHTML = `<div class="empty-state">😕 Nenhum cliente encontrado com similaridade ≥ ${minSim}% para "${escapeHtml(query)}". Tente um nome diferente ou reduza o percentual.</div>`;
+            resultStatsSpan.innerHTML = `❌ Nenhum resultado para "${escapeHtml(query)}"`;
+            return;
+        }
+        
+        // estatística
+        resultStatsSpan.innerHTML = `✅ ${results.length} resultado(s) encontrado(s) para "${escapeHtml(query)}" (similaridade ≥ ${minSim}%)`;
+        
+        // gerar cards
+        let html = '';
+        for (let res of results) {
+            html += `
+                <div class="contact-card">
+                    <div class="contact-name">
+                        <span>📌 ${escapeHtml(res.nome)}</span>
+                        <span class="similarity-tag">${res.similaridade}% match</span>
+                    </div>
+                    <div class="contact-phone">
+                        📞 ${formatPhoneNumber(res.telefone)}
+                    </div>
+                    <a href="${res.link}" target="_blank" rel="noopener noreferrer" class="whatsapp-link">
+                        💬 Conversar no WhatsApp → 
                     </a>
-                `;
-                resultsList.appendChild(card);
-            });
-            resultsDiv.style.display = 'block';
+                </div>
+            `;
         }
-        
-        async function buscarCliente(nome) {
-            if (!nome) {
-                showError('Digite um nome para buscar');
-                return;
-            }
-            
-            loading.style.display = 'block';
-            resultsDiv.style.display = 'none';
-            errorMessageDiv.style.display = 'none';
-            
-            setTimeout(() => {
-                const resultados = buscarClientes(nome);
-                displayResults(resultados, nome);
-                loading.style.display = 'none';
-            }, 300);
-        }
-        
-        // Eventos
-        searchButton.addEventListener('click', () => {
-            const nome = searchInput.value.trim();
-            if (nome) buscarCliente(nome);
+        resultsContainer.innerHTML = html;
+    }
+    
+    // função auxiliar para formatar telefone (opcional)
+    function formatPhoneNumber(phone) {
+        if (!phone) return phone;
+        // apenas exibe o número de forma legível
+        let cleaned = phone.replace(/\D/g, '');
+        if (cleaned.length === 13 && cleaned.startsWith('55')) cleaned = cleaned.slice(2);
+        if (cleaned.length === 11) return `(${cleaned.slice(0,2)}) ${cleaned.slice(2,3)} ${cleaned.slice(3,7)}-${cleaned.slice(7)}`;
+        if (cleaned.length === 10) return `(${cleaned.slice(0,2)}) ${cleaned.slice(2,6)}-${cleaned.slice(6)}`;
+        return phone;
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
         });
-        
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const nome = searchInput.value.trim();
-                if (nome) buscarCliente(nome);
-            }
-        });
-    </script>
+    }
+    
+    // Eventos
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') performSearch();
+    });
+    
+    // Opcional: busca ao carregar página com placeholder? Não, mantém vazio.
+    // Mostrar contagem já carregada
+    document.getElementById('totalCount').innerText = contactList.length;
+</script>
 </body>
 </html>
